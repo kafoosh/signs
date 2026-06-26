@@ -170,7 +170,7 @@ body{
 .rankblock{display:flex;align-items:center;gap:10px;background:var(--paper);color:var(--ink);
   border-radius:14px;padding:11px 14px;margin-bottom:9px;box-shadow:0 4px 0 rgba(0,0,0,.24);
   font-family:"Manrope";font-weight:800;font-size:15.5px;line-height:1.15;touch-action:none;
-  transition:transform .15s var(--spring),box-shadow .12s;}
+  transition:box-shadow .12s;}  /* no transform transition: the drag follows the finger instantly */
 .rankblock .rtxt{flex:1 1 auto;min-width:0;}
 .rankblock.drag{opacity:.92;transform:scale(1.04) rotate(-1.5deg);box-shadow:0 12px 22px rgba(0,0,0,.4);z-index:5;}
 .rankblock .grip{font-size:22px;color:var(--grape2);cursor:grab;}
@@ -686,43 +686,48 @@ document.querySelector('#madlibs [data-next]').addEventListener('click',function
 (function rankInit(){
   var list=document.getElementById('rankList');
   var items=['Pizza','2.592','The letter Q','Ranking things','The rain on your skin (no one else can feel it for you)'];
-  function render(){
-    list.innerHTML='';
-    items.forEach(function(txt,i){
-      var row=document.createElement('div'); row.className='rankblock'; row.dataset.idx=i;
-      row.innerHTML='<span class="grip">⠿</span><span class="rtxt">'+txt+'</span>'+
-        '<span class="arrs"><button data-up aria-label="move up">▲</button><button data-dn aria-label="move down">▼</button></span>';
-      row.querySelector('[data-up]').addEventListener('click',function(e){e.stopPropagation();if(i>0){var t=items[i-1];items[i-1]=items[i];items[i]=t;render();}});
-      row.querySelector('[data-dn]').addEventListener('click',function(e){e.stopPropagation();if(i<items.length-1){var t=items[i+1];items[i+1]=items[i];items[i]=t;render();}});
-      attachDrag(row);
-      list.appendChild(row);
-    });
+  function rowIndex(row){ return Array.prototype.indexOf.call(list.children,row); }
+  function makeRow(txt){
+    var row=document.createElement('div'); row.className='rankblock';
+    row.innerHTML='<span class="grip">⠿</span><span class="rtxt"></span>'+
+      '<span class="arrs"><button data-up aria-label="move up">▲</button><button data-dn aria-label="move down">▼</button></span>';
+    row.querySelector('.rtxt').textContent=txt;
+    row.querySelector('[data-up]').addEventListener('click',function(e){ e.stopPropagation();
+      var i=rowIndex(row); if(i>0) list.insertBefore(row, list.children[i-1]); });
+    row.querySelector('[data-dn]').addEventListener('click',function(e){ e.stopPropagation();
+      var i=rowIndex(row); if(i<list.children.length-1) list.insertBefore(list.children[i+1], row); });
+    row.addEventListener('pointerdown',onDown);
+    return row;
   }
-  var dragEl=null,startY=0,startIdx=0,curIdx=0;
-  function attachDrag(row){
-    row.addEventListener('pointerdown',function(e){
-      if(e.target.closest('button')) return;
-      dragEl=row; startY=e.clientY; startIdx=curIdx=parseInt(row.dataset.idx,10);
-      row.classList.add('drag'); row.setPointerCapture(e.pointerId);
-    });
+  function render(){ list.innerHTML=''; items.forEach(function(t){ list.appendChild(makeRow(t)); }); }
+
+  // ---- drag: the block tracks the finger exactly (transform = desiredTop - its
+  // natural offsetTop), and reorders by comparing its centre to a NEIGHBOUR'S real
+  // midpoint — so it never drifts off the finger and variable row heights are handled.
+  var dragEl=null, grabOffset=0;
+  function onDown(e){
+    if(e.target.closest('button')) return;
+    dragEl=this;
+    grabOffset=(e.clientY - list.getBoundingClientRect().top) - dragEl.offsetTop; // where on the row you grabbed
+    dragEl.classList.add('drag');
+    try{ dragEl.setPointerCapture(e.pointerId); }catch(_){}
+    e.preventDefault();
   }
   list.addEventListener('pointermove',function(e){
     if(!dragEl) return;
-    var dy=e.clientY-startY;
-    dragEl.style.transform='translateY('+dy+'px) scale(1.04) rotate(-1.5deg)';
-    var rowH=dragEl.offsetHeight+12;
-    var newIdx=Math.max(0,Math.min(items.length-1,startIdx+Math.round(dy/rowH)));
-    if(newIdx!==curIdx){
-      var moved=items.splice(startIdx,1)[0];
-      items.splice(newIdx,0,moved);
-      startIdx=newIdx; curIdx=newIdx; startY=e.clientY;
-      render();
-      dragEl=list.querySelector('[data-idx="'+newIdx+'"]');
-      dragEl.classList.add('drag');
-      try{dragEl.setPointerCapture(e.pointerId);}catch(_){}
-    }
+    var desiredTop=(e.clientY - list.getBoundingClientRect().top) - grabOffset; // where the row's top should sit
+    function follow(){ dragEl.style.transform='translateY('+(desiredTop - dragEl.offsetTop)+'px) scale(1.04) rotate(-1.5deg)'; }
+    follow();
+    var mid=desiredTop + dragEl.offsetHeight/2, i=rowIndex(dragEl);
+    var prev=list.children[i-1], next=list.children[i+1];
+    if(prev && mid < prev.offsetTop + prev.offsetHeight/2){ list.insertBefore(dragEl, prev); follow(); }
+    else if(next && mid > next.offsetTop + next.offsetHeight/2){ list.insertBefore(next, dragEl); follow(); }
   });
-  function endDrag(){ if(dragEl){dragEl.classList.remove('drag');dragEl.style.transform='';dragEl=null;} }
+  function endDrag(){ if(!dragEl) return;
+    dragEl.classList.remove('drag'); dragEl.style.transform='';
+    dragEl=null;
+    items=Array.prototype.map.call(list.children,function(r){ return r.querySelector('.rtxt').textContent; }); // commit order
+  }
   list.addEventListener('pointerup',endDrag);
   list.addEventListener('pointercancel',endDrag);
   render();

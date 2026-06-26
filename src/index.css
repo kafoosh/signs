@@ -425,7 +425,8 @@ body {
   font-size: 15.5px;
   line-height: 1.15;
   touch-action: none;
-  transition: transform 0.15s var(--spring), box-shadow 0.12s;
+  /* no transform transition — Framer Motion's Reorder drives the drag transform directly. */
+  transition: box-shadow 0.12s;
 }
 .rankblock .rtxt {
   flex: 1 1 auto;
