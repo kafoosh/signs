@@ -111,14 +111,13 @@ export default function Reveal({ captured, signName }) {
             </div>
           </div>
         )}
-      </div>
 
-      <div id="cardStage" className={showCard ? 'show' : ''}>
+        {/* Card + caption live INSIDE the scroll, so they scroll with the reading. */}
         {showCard && (
-          <>
+          <div id="cardStage" className="show">
             <PlayingCard captured={captured} />
             <div className="revcap">{cardCaption(captured)}</div>
-          </>
+          </div>
         )}
       </div>
 
