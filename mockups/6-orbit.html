@@ -853,7 +853,7 @@ var revBlocks=[], revIdx=0;
 function buildReveal(){
   var suit=SUITS[captured.suitIdx], val=VALNAMES[captured.valueIdx];
   revBlocks=[];
-  revBlocks.push({h:'Intro',cls:'intro',text:'Hello '+chosenSign.name+'. Welcome to your astrology reading on '+readingDate()+'. Here is your reading...'});
+  revBlocks.push({h:'Intro',cls:'intro',text:'Hello '+chosenSign.name+'. Welcome to your astrology reading on '+readingDate()+". Here's what I think..."});
   SECTIONS.forEach(function(s){
     var opt=s.o[Math.floor(Math.random()*s.o.length)];
     revBlocks.push({h:s.h,cls:'',text:opt});

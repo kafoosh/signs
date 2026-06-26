@@ -102,7 +102,7 @@ export function buildRevealBlocks(signName) {
       signName +
       '. Welcome to your astrology reading on ' +
       readingDate() +
-      '. Here is your reading...',
+      ". Here's what I think...",
   })
   SECTIONS.forEach((s) => {
     const opt = s.o[Math.floor(Math.random() * s.o.length)]
