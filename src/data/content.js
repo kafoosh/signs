@@ -34,7 +34,7 @@ export const RANGERS = [
 export const RANK_ITEMS = [
   'Pizza',
   '2.592',
-  'The letter P',
+  'The letter Q',
   'Ranking things',
   'The rain on your skin (no one else can feel it for you)',
 ]

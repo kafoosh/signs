@@ -42,30 +42,19 @@ body {
   font-weight: 700;
 }
 
-/* ===== device surround on wide screens ===== */
+/* Full-bleed web page (no phone frame): the grape backdrop + shapes fill the whole
+   window; only the CONTENT is held to a centred column so it stays readable on desktop. */
 #wrap {
   position: fixed;
   inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: radial-gradient(circle at 30% 20%, #4a1186 0%, #250646 55%, #15032b 100%);
+  background: var(--grape);
 }
 #app {
   position: relative;
   width: 100%;
   height: 100dvh;
-  max-width: 480px;
   overflow: hidden;
   background: var(--grape);
-}
-@media (min-width: 520px) {
-  #app {
-    height: min(900px, 96dvh);
-    max-height: 900px;
-    border-radius: 36px;
-    box-shadow: 0 30px 90px rgba(0, 0, 0, 0.55), 0 0 0 10px #120226;
-  }
 }
 
 /* ===== background collage shapes ===== */
@@ -96,8 +85,8 @@ body {
   z-index: 2;
   display: flex;
   flex-direction: column;
-  padding: calc(env(safe-area-inset-top) + 18px) 22px
-    calc(env(safe-area-inset-bottom) + 40px);
+  padding: calc(env(safe-area-inset-top) + 18px)
+    max(22px, calc((100% - 440px) / 2)) calc(env(safe-area-inset-bottom) + 40px);
   overflow: hidden;
 }
 
