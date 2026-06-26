@@ -1,3 +1,4 @@
+import { forwardRef } from 'react'
 import { motion } from 'framer-motion'
 import { stagger, popIn } from '../lib/motion.js'
 
@@ -18,12 +19,16 @@ export function StaggerGroup({ children, className, style, as = 'div', ...rest }
   )
 }
 
-// A single staggered child.
-export function StaggerItem({ children, className, style, as = 'div', ...rest }) {
+// A single staggered child. forwardRef so callers can grab the DOM node
+// (e.g. an <input> via `as="input"` + ref) — needed to read/focus the name field.
+export const StaggerItem = forwardRef(function StaggerItem(
+  { children, className, style, as = 'div', ...rest },
+  ref,
+) {
   const MotionTag = motion[as] || motion.div
   return (
-    <MotionTag className={className} style={style} variants={popIn} {...rest}>
+    <MotionTag ref={ref} className={className} style={style} variants={popIn} {...rest}>
       {children}
     </MotionTag>
   )
-}
+})

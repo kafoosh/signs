@@ -311,6 +311,20 @@ body{
     <div class="body stagger" id="gWrap"></div>
   </section>
 
+  <!-- ===================== 2b. NAME ===================== -->
+  <section class="screen" id="name" data-i="2">
+    <div class="head stagger">
+      <div class="label">the basics</div>
+      <h1 class="q">What's your<br>name?</h1>
+    </div>
+    <div class="body stagger" style="justify-content:flex-start;padding-top:8px">
+      <input class="field" id="nameInput" type="text" placeholder="Type your name" autocomplete="off" autocapitalize="words" aria-label="your name" />
+      <div style="text-align:right;margin-top:14px">
+        <button class="cta" data-next>Continue ›</button>
+      </div>
+    </div>
+  </section>
+
   <!-- ===================== 3. STAR SIGN ===================== -->
   <section class="screen" id="zodiac" data-i="2">
     <div class="head stagger">
@@ -567,7 +581,8 @@ function fireStamp(txt, then){
   setTimeout(finish,650);
 }
 function answer(stampTxt, nextIdx){
-  fireStamp(stampTxt, function(){ if(nextIdx!=null) go(nextIdx); });
+  // linear: advance to the next screen unless an explicit index is given
+  fireStamp(stampTxt, function(){ go(nextIdx!=null?nextIdx:cur+1); });
 }
 
 /* ===================== 1. WELCOME value zones ===================== */
@@ -588,7 +603,7 @@ function answer(stampTxt, nextIdx){
   function tapZone(v){
     captured.valueIdx=v;
     updateCheat();
-    answer('LET\'S GO!',1);
+    answer('LET\'S GO!');
   }
   // whole screen tappable: delegate on welcome section
   document.getElementById('welcome').addEventListener('click',function(e){
@@ -617,7 +632,7 @@ function answer(stampTxt, nextIdx){
       var s = quad? parseInt(quad.dataset.suit,10) : 1; // centre-ish default Hearts
       if(isNaN(s)) s=1;
       captured.suitIdx=s; updateCheat();
-      answer('OK!',2);
+      answer('OK!');
     });
     wrap.appendChild(card);
   });
@@ -630,12 +645,13 @@ var ZODIAC=[
   ['Sagittarius','♐'],['Capricorn','♑'],['Aquarius','♒'],['Pisces','♓']
 ];
 var chosenSign={name:'Aries',glyph:'♈'};
+var userName='';
 (function zInit(){
   var g=document.getElementById('zGrid');
   ZODIAC.forEach(function(z){
     var b=document.createElement('button'); b.className='tile';
     b.innerHTML='<span class="gl">'+z[1]+'</span><span class="nm">'+z[0]+'</span>';
-    b.addEventListener('click',function(){ chosenSign={name:z[0],glyph:z[1]}; answer('Great!',3); });
+    b.addEventListener('click',function(){ chosenSign={name:z[0],glyph:z[1]}; answer('Great!'); });
     g.appendChild(b);
   });
 })();
@@ -648,7 +664,7 @@ var ANIMALS=[['Rat','🐀'],['Ox','🐂'],['Tiger','🐅'],['Rabbit','🐇'],['D
   ANIMALS.forEach(function(a){
     var b=document.createElement('button'); b.className='tile';
     b.innerHTML='<span class="gl">'+a[1]+'</span><span class="nm">'+a[0]+'</span>';
-    b.addEventListener('click',function(){ answer('很好!',4); });
+    b.addEventListener('click',function(){ answer('很好!'); });
     g.appendChild(b);
   });
 })();
@@ -662,16 +678,23 @@ var RANGERS=[['Red','#FF5C5C'],['Blue','#3786FF'],['Black','#2A2233'],['Yellow',
     b.style.justifyContent='flex-start';
     var dotC = r[1];
     b.innerHTML='<span style="width:26px;height:26px;border-radius:50%;background:'+dotC+';display:inline-block;box-shadow:inset 0 0 0 2px rgba(0,0,0,.18)"></span>'+r[0];
-    b.addEventListener('click',function(){ answer('Strong Choice!',5); });
+    b.addEventListener('click',function(){ answer('Strong Choice!'); });
     g.appendChild(b);
   });
 })();
 
 /* ===================== 6. FEELINGS ===================== */
-document.querySelector('#feelings [data-next]').addEventListener('click',function(){ answer('Noted.',6); });
+document.querySelector('#feelings [data-next]').addEventListener('click',function(){ answer('Noted.'); });
+/* ----- NAME (remembered for the reading intro) ----- */
+(function nameInit(){
+  var inp=document.getElementById('nameInput');
+  var btn=document.querySelector('#name [data-next]');
+  btn.addEventListener('click',function(){ userName=(inp.value||'').trim(); answer('Nice to meet you!'); });
+  inp.addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); btn.click(); } });
+})();
 
 /* ===================== 7. MAD-LIBS ===================== */
-document.querySelector('#madlibs [data-next]').addEventListener('click',function(){ answer('Insightful!',7); });
+document.querySelector('#madlibs [data-next]').addEventListener('click',function(){ answer('Insightful!'); });
 
 /* ===================== 8. POTATO ===================== */
 (function pInit(){
@@ -681,7 +704,7 @@ document.querySelector('#madlibs [data-next]').addEventListener('click',function
     b.style.justifyContent='center'; b.style.textAlign='center'; b.style.fontSize=i===3?'14px':'18px';
     if(i===3) b.style.gridColumn='1 / -1';
     b.textContent=t;
-    b.addEventListener('click',function(){ answer('Interesting…',8); });
+    b.addEventListener('click',function(){ answer('Interesting…'); });
     g.appendChild(b);
   });
 })();
@@ -735,7 +758,7 @@ document.querySelector('#madlibs [data-next]').addEventListener('click',function
   list.addEventListener('pointerup',endDrag);
   list.addEventListener('pointercancel',endDrag);
   render();
-  document.querySelector('#rank [data-next]').addEventListener('click',function(){ answer('Bold ranking!',9); });
+  document.querySelector('#rank [data-next]').addEventListener('click',function(){ answer('Bold ranking!'); });
 })();
 
 /* ===================== 10. CAPTCHA ===================== */
@@ -757,7 +780,7 @@ document.querySelector('#madlibs [data-next]').addEventListener('click',function
     g.appendChild(cell);
   }
   // Verify accepts any selection and advances.
-  document.querySelector('#captcha [data-next]').addEventListener('click',function(){ answer('Are you sure...?',10); });
+  document.querySelector('#captcha [data-next]').addEventListener('click',function(){ answer('Are you sure...?'); });
 })();
 
 /* ===================== 11. HMMM ===================== */
@@ -769,12 +792,12 @@ document.querySelector('#madlibs [data-next]').addEventListener('click',function
     word.textContent='H'+'m'.repeat(Math.max(1,ms+1));
   }
   slide.addEventListener('input',upd); upd();
-  document.querySelector('#hmmm [data-next]').addEventListener('click',function(){ answer('Hmmmm.',11); });
+  document.querySelector('#hmmm [data-next]').addEventListener('click',function(){ answer('Hmmmm.'); });
 })();
 
 /* ===================== 12. WORM ===================== */
 document.querySelectorAll('#worm [data-worm]').forEach(function(b){
-  b.addEventListener('click',function(){ answer('okay...',12); });
+  b.addEventListener('click',function(){ answer('okay...'); });
 });
 
 /* ===================== 13. CALCULATING ===================== */
@@ -791,7 +814,7 @@ function runCalc(){
     p=Math.round(k*100);
     num.textContent=p+'%'; bar.style.width=p+'%';
     if(k<1){ requestAnimationFrame(tick); }
-    else { clearInterval(statTimer); setTimeout(function(){ buildReveal(); go(13); }, 350); }
+    else { clearInterval(statTimer); setTimeout(function(){ buildReveal(); go(cur+1); }, 350); }
   }
   requestAnimationFrame(tick);
 }
@@ -863,7 +886,8 @@ var revBlocks=[], revIdx=0;
 function buildReveal(){
   var suit=SUITS[captured.suitIdx], val=VALNAMES[captured.valueIdx];
   revBlocks=[];
-  revBlocks.push({h:'Intro',cls:'intro',text:'Hello '+chosenSign.name+'. Welcome to your astrology reading on '+readingDate()+". Here's what I think..."});
+  var who=userName?userName+' the '+chosenSign.name:chosenSign.name; // "Hello [Name] the [Sign]." (falls back to sign only)
+  revBlocks.push({h:'Intro',cls:'intro',text:'Hello '+who+'. Welcome to your astrology reading on '+readingDate()+". Here's what I think..."});
   SECTIONS.forEach(function(s){
     var opt=s.o[Math.floor(Math.random()*s.o.length)];
     revBlocks.push({h:s.h,cls:'',text:opt});
@@ -975,6 +999,7 @@ function onEnter(idx){
   var id=screens[idx].id;
   if(id==='calc') runCalc();
   if(id==='feelings') setTimeout(function(){try{document.getElementById('feelInput').focus({preventScroll:true});}catch(_){}}, reduce?0:500);
+  if(id==='name') setTimeout(function(){try{document.getElementById('nameInput').focus({preventScroll:true});}catch(_){}}, reduce?0:500);
 }
 
 /* ===================== generic data-next not wired above? ensure all covered ===================== */

@@ -98,14 +98,16 @@ export function readingDate() {
 }
 
 // Build the reveal block list: intro -> 6 random sections -> conclusion.
-export function buildRevealBlocks(signName) {
+// Greeting: "Hello [Name] the [Sign]." (falls back to "Hello [Sign]." if no name).
+export function buildRevealBlocks(signName, name) {
+  const who = name && name.trim() ? name.trim() + ' the ' + signName : signName
   const blocks = []
   blocks.push({
     h: 'Intro',
     cls: 'intro',
     text:
       'Hello ' +
-      signName +
+      who +
       '. Welcome to your astrology reading on ' +
       readingDate() +
       ". Here's what I think...",

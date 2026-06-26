@@ -9,6 +9,7 @@ import CheatSheet from './components/CheatSheet.jsx'
 
 import Welcome from './screens/Welcome.jsx'
 import Gender from './screens/Gender.jsx'
+import Name from './screens/Name.jsx'
 import Zodiac from './screens/Zodiac.jsx'
 import Chinese from './screens/Chinese.jsx'
 import Ranger from './screens/Ranger.jsx'
@@ -22,9 +23,10 @@ import Worm from './screens/Worm.jsx'
 import Calculating from './screens/Calculating.jsx'
 import Reveal from './screens/Reveal.jsx'
 
-// Screen indices 0..13
+// Linear flow: advancing is always "next", so inserting a screen here is the
+// only change needed (no hardcoded indices to renumber).
 const SCREENS = [
-  'welcome', 'gender', 'zodiac', 'chinese', 'ranger', 'feelings',
+  'welcome', 'gender', 'name', 'zodiac', 'chinese', 'ranger', 'feelings',
   'madlibs', 'potato', 'rank', 'captcha', 'hmmm', 'worm', 'calc', 'reveal',
 ]
 
@@ -34,6 +36,7 @@ export default function App() {
   // The secret: default = Seven of Spades (centre taps still yield a playable card).
   const [captured, setCaptured] = useState({ valueIdx: 6, suitIdx: 2 })
   const [chosenSign, setChosenSign] = useState({ name: 'Aries', glyph: '♈' })
+  const [name, setName] = useState('')
 
   const [stamp, setStamp] = useState(null)
   const [infoOpen, setInfoOpen] = useState(false)
@@ -42,31 +45,43 @@ export default function App() {
   const stampTimer = useRef(null)
   const busy = useRef(false)
 
-  // Fire the slap-in stamp, then optionally advance to the next screen.
-  const answer = useCallback((stampTxt, nextIdx) => {
-    if (busy.current) return
-    busy.current = true
-    setStamp(stampTxt)
-    clearTimeout(stampTimer.current)
-    stampTimer.current = setTimeout(() => {
-      setStamp(null)
-      if (nextIdx != null) setIdx(nextIdx)
-      busy.current = false
-    }, 650)
-  }, [])
+  const next = useCallback(
+    () => setIdx((i) => Math.min(i + 1, SCREENS.length - 1)),
+    [],
+  )
 
-  // --- secret capture ---
+  // Fire the slap-in stamp, then advance to the next screen.
+  const answer = useCallback(
+    (stampTxt) => {
+      if (busy.current) return
+      busy.current = true
+      setStamp(stampTxt)
+      clearTimeout(stampTimer.current)
+      stampTimer.current = setTimeout(() => {
+        setStamp(null)
+        next()
+        busy.current = false
+      }, 650)
+    },
+    [next],
+  )
+
+  // --- secret capture + remembered answers ---
   const captureValue = (v) => {
     setCaptured((c) => ({ ...c, valueIdx: v }))
-    answer("LET'S GO!", 1)
+    answer("LET'S GO!")
   }
   const captureSuit = (s) => {
     setCaptured((c) => ({ ...c, suitIdx: s }))
-    answer('OK!', 2)
+    answer('OK!')
+  }
+  const submitName = (n) => {
+    setName(n)
+    answer('Nice to meet you!')
   }
   const chooseSign = (sign) => {
     setChosenSign(sign)
-    answer('Great!', 3)
+    answer('Great!')
   }
 
   // --- triple-tap credit -> cheat-sheet ---
@@ -93,30 +108,32 @@ export default function App() {
         return <Welcome onCapture={captureValue} />
       case 'gender':
         return <Gender onCapture={captureSuit} />
+      case 'name':
+        return <Name onSubmit={submitName} />
       case 'zodiac':
         return <Zodiac onChoose={chooseSign} />
       case 'chinese':
-        return <Chinese onAnswer={() => answer('很好!', 4)} />
+        return <Chinese onAnswer={() => answer('很好!')} />
       case 'ranger':
-        return <Ranger onAnswer={() => answer('Strong Choice!', 5)} />
+        return <Ranger onAnswer={() => answer('Strong Choice!')} />
       case 'feelings':
-        return <Feelings onAnswer={() => answer('Noted.', 6)} />
+        return <Feelings onAnswer={() => answer('Noted.')} />
       case 'madlibs':
-        return <Madlibs onAnswer={() => answer('Insightful!', 7)} />
+        return <Madlibs onAnswer={() => answer('Insightful!')} />
       case 'potato':
-        return <Potato onAnswer={() => answer('Interesting…', 8)} />
+        return <Potato onAnswer={() => answer('Interesting…')} />
       case 'rank':
-        return <Rank onAnswer={() => answer('Bold ranking!', 9)} />
+        return <Rank onAnswer={() => answer('Bold ranking!')} />
       case 'captcha':
-        return <Captcha onAnswer={() => answer('Are you sure...?', 10)} />
+        return <Captcha onAnswer={() => answer('Are you sure...?')} />
       case 'hmmm':
-        return <Hmmm onAnswer={() => answer('Hmmmm.', 11)} />
+        return <Hmmm onAnswer={() => answer('Hmmmm.')} />
       case 'worm':
-        return <Worm onAnswer={() => answer('okay...', 12)} />
+        return <Worm onAnswer={() => answer('okay...')} />
       case 'calc':
-        return <Calculating onDone={() => setIdx(13)} />
+        return <Calculating onDone={next} />
       case 'reveal':
-        return <Reveal captured={captured} signName={chosenSign.name} />
+        return <Reveal captured={captured} signName={chosenSign.name} name={name} />
       default:
         return null
     }

@@ -6,9 +6,9 @@ import Confetti from '../components/Confetti.jsx'
 
 // Typewriter reading: intro -> 6 random sections -> conclusion -> card.
 // CR11: only the current/most-recent section keeps a blinking caret.
-export default function Reveal({ captured, signName }) {
+export default function Reveal({ captured, signName, name }) {
   const reduce = useReducedMotion()
-  const blocks = useMemo(() => buildRevealBlocks(signName), [signName])
+  const blocks = useMemo(() => buildRevealBlocks(signName, name), [signName, name])
 
   const [committed, setCommitted] = useState([]) // fully-typed, caret-free blocks
   const [active, setActive] = useState(null) // {block, text} currently/just typed (has caret)
