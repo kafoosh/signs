@@ -578,11 +578,23 @@ body {
   flex: 1 1 auto;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  padding-right: 4px;
   min-height: 0;
+  scrollbar-width: none; /* Firefox: hide scrollbar */
+  -ms-overflow-style: none;
 }
 #revScroll::-webkit-scrollbar {
-  width: 0;
+  display: none; /* WebKit: hide scrollbar */
+}
+
+/* Ranking: scroll vertically only and never show a bar (the drag lift can briefly
+   overflow horizontally — clip it instead of spawning a bottom scrollbar). */
+#rank .body {
+  overflow-x: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+#rank .body::-webkit-scrollbar {
+  display: none;
 }
 .revblock {
   margin-bottom: 20px;

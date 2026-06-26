@@ -64,8 +64,14 @@ export const SECTIONS = [
   },
 ]
 
-export const CONCLUSION =
-  "It's very interesting doing your reading. You are certainly bright, and open to life's possibilities, something not normally found among achieving people. You would do well to be less self-absorbed, as it tends to distance you a little. You could let people in a little more, but I am aware there is a side you feel you should hide, but you really have an appealing personality, and also..."
+// One picked at random per reading so the close isn't always the same.
+export const CONCLUSIONS = [
+  "It's very interesting doing your reading. You are certainly bright, and open to life's possibilities, something not normally found among achieving people. You would do well to be less self-absorbed, as it tends to distance you a little. You could let people in a little more, but I am aware there is a side you feel you should hide, but you really have an appealing personality, and also...",
+  "Your reading reveals someone with significant untapped potential and genuine depth. You have real insight into human nature, which is both a gift and a burden. While you present confidence to the world, there's a part of you that questions your own worth more often than necessary. Others appreciate you far more than you realize, and you'd benefit from trusting their perception of you more than your own self-judgment. And also...",
+  "What strikes me about your reading is the contrast between your inner complexity and your outer composure. You're clearly intelligent and capable, yet you carry a weight that you don't fully share with others. This protective instinct makes sense, but it sometimes prevents people from truly knowing you. You have more to offer than you typically allow yourself to give, and the world would benefit from seeing more of the real you. And also...",
+  "Your reading shows someone with considerable emotional intelligence and self-awareness. You understand people deeply, perhaps too deeply. You often absorb their problems as your own. While your empathy is genuinely admirable, you'd find more peace by recognizing that you cannot fix everything. You're far more remarkable than your self-criticism allows you to believe, and others see this even when you don't. And also...",
+  "I find your reading quite compelling. You are thoughtful, perceptive, and far more capable than you sometimes give yourself credit for. There's a tendency in you to retreat when challenged or uncertain, a protective mechanism that once served you well. However, your greatest growth will come from stepping into your own light more fully. People are drawn to your authenticity. Trust that more, and doubt yourself less. And also...",
+]
 
 export function ordinalWord(n) {
   const ones = [
@@ -108,6 +114,10 @@ export function buildRevealBlocks(signName) {
     const opt = s.o[Math.floor(Math.random() * s.o.length)]
     blocks.push({ h: s.h, cls: '', text: opt })
   })
-  blocks.push({ h: 'In Conclusion', cls: '', text: CONCLUSION })
+  blocks.push({
+    h: 'In Conclusion',
+    cls: '',
+    text: CONCLUSIONS[Math.floor(Math.random() * CONCLUSIONS.length)],
+  })
   return blocks
 }
