@@ -1,0 +1,1010 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<title>Signs Orbit</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --grape:#3B0A6E;
+  --grape2:#56119E;
+  --yellow:#FCEE21;
+  --coral:#FF5C5C;
+  --mint:#37E0A6;
+  --ink:#1A0533;
+  --paper:#FFF7E6;
+  --spring:cubic-bezier(.22,1.4,.36,1);
+  --softspring:cubic-bezier(.18,1.25,.4,1);
+  font-size:16px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;height:100%;width:100%;overflow:hidden;}
+body{
+  position:fixed;inset:0;
+  font-family:"Manrope","Space Grotesk",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  background:#250646;color:#fff;
+  -webkit-user-select:none;user-select:none;
+  touch-action:manipulation;overscroll-behavior:none;
+  font-weight:700;
+}
+
+/* ===== device surround on wide screens ===== */
+#wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(circle at 30% 20%,#4a1186 0%,#250646 55%,#15032b 100%);}
+#app{position:relative;width:100%;height:100dvh;max-width:480px;overflow:hidden;
+  background:var(--grape);}
+@media(min-width:520px){
+  #app{height:min(900px,96dvh);max-height:900px;border-radius:36px;
+    box-shadow:0 30px 90px rgba(0,0,0,.55),0 0 0 10px #120226;}
+}
+
+/* ===== background collage shapes ===== */
+#bg{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none;}
+.shape{position:absolute;will-change:transform;}
+.blob{border-radius:48% 52% 56% 44%/52% 46% 54% 48%;}
+.ring{border-radius:50%;border:7px solid currentColor;background:transparent;}
+.dot{border-radius:50%;}
+.star{font-family:"Manrope";font-weight:800;line-height:1;display:flex;align-items:center;justify-content:center;}
+.squig{stroke:currentColor;stroke-width:9;fill:none;stroke-linecap:round;}
+@keyframes drift{0%{transform:translate(0,0) rotate(0deg);}50%{transform:translate(var(--dx,14px),var(--dy,-18px)) rotate(var(--dr,18deg));}100%{transform:translate(0,0) rotate(0deg);}}
+@keyframes spinslow{from{transform:rotate(0);}to{transform:rotate(360deg);}}
+@keyframes orbit{from{transform:rotate(0) translateX(var(--orad,120px)) rotate(0);}to{transform:rotate(360deg) translateX(var(--orad,120px)) rotate(-360deg);}}
+
+/* ===== screens ===== */
+.screen{position:absolute;inset:0;z-index:2;display:none;flex-direction:column;
+  padding:calc(env(safe-area-inset-top) + 18px) 22px calc(env(safe-area-inset-bottom) + 40px);
+  overflow:hidden;}
+#app.s-active .screen.active{display:flex;}
+.screen.enter{animation:scrIn .42s var(--softspring) both;}
+.screen.leave{animation:scrOut .3s ease-in both;}
+@keyframes scrIn{from{opacity:0;transform:translateY(34px) scale(.97);}to{opacity:1;transform:none;}}
+@keyframes scrOut{from{opacity:1;transform:none;}to{opacity:0;transform:translateY(-26px) scale(1.03);}}
+
+/* stagger entrance */
+.stagger>*{opacity:0;animation:pop .5s var(--spring) forwards;}
+@keyframes pop{from{opacity:0;transform:translateY(20px) scale(.9) rotate(-2deg);}to{opacity:1;transform:none;}}
+.screen.active .stagger>*{animation-play-state:running;}
+
+/* ===== typography ===== */
+.label{font-family:"Space Grotesk";font-weight:700;font-size:13px;letter-spacing:.22em;text-transform:uppercase;color:var(--yellow);}
+.q{font-family:"Manrope";font-weight:800;letter-spacing:-.03em;line-height:.98;
+  font-size:clamp(30px,9vw,44px);margin:6px 0 0;overflow-wrap:break-word;}
+.sub{font-family:"Space Grotesk";font-weight:500;font-size:15px;color:rgba(255,255,255,.78);margin-top:12px;line-height:1.4;}
+.head{flex:0 0 auto;min-width:0;max-width:100%;}
+.body{flex:1 1 auto;display:flex;flex-direction:column;justify-content:center;min-height:0;min-width:0;max-width:100%;align-items:stretch;}
+.foot{flex:0 0 auto;min-width:0;max-width:100%;}
+
+/* ===== answer cards / chips ===== */
+.opt{display:flex;align-items:center;gap:12px;width:100%;border:none;cursor:pointer;
+  font-family:"Manrope";font-weight:800;color:var(--ink);background:var(--paper);
+  border-radius:18px;padding:18px 20px;font-size:18px;text-align:left;min-height:60px;
+  box-shadow:0 6px 0 rgba(0,0,0,.28);transition:transform .12s var(--spring),box-shadow .12s;
+  letter-spacing:-.01em;}
+.opt:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.28);}
+.opt .em{font-size:24px;flex:0 0 auto;}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;width:100%;min-width:0;}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;width:100%;min-width:0;}
+.tile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  border:none;cursor:pointer;background:var(--paper);color:var(--ink);border-radius:16px;
+  padding:12px 4px;min-height:82px;box-shadow:0 5px 0 rgba(0,0,0,.26);min-width:0;
+  transition:transform .12s var(--spring),box-shadow .12s;font-family:"Manrope";font-weight:800;}
+.tile:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.26);}
+.tile .gl{font-size:26px;line-height:1;}
+.tile .nm{font-size:11.5px;letter-spacing:-.02em;text-align:center;line-height:1.05;max-width:100%;overflow-wrap:break-word;}
+@media(hover:hover){.opt:hover,.tile:hover{transform:translateY(-2px) rotate(-1deg);}}
+
+.cta{display:inline-flex;align-items:center;gap:8px;border:none;cursor:pointer;
+  font-family:"Manrope";font-weight:800;font-size:17px;color:var(--grape);background:var(--yellow);
+  border-radius:50px;padding:15px 30px;box-shadow:0 6px 0 #c9bd00;
+  transition:transform .12s var(--spring),box-shadow .12s;letter-spacing:-.01em;}
+.cta:active{transform:translateY(4px);box-shadow:0 2px 0 #c9bd00;}
+.cta.coral{color:#fff;background:var(--coral);box-shadow:0 6px 0 #c23b3b;}
+.cta.coral:active{box-shadow:0 2px 0 #c23b3b;}
+
+/* text inputs */
+.field{width:100%;border:none;outline:none;font-family:"Manrope";font-weight:800;
+  background:var(--paper);color:var(--ink);border-radius:16px;padding:16px 18px;font-size:18px;
+  box-shadow:0 5px 0 rgba(0,0,0,.22) inset, 0 0 0 0 var(--yellow);}
+.field::placeholder{color:rgba(26,5,51,.35);}
+.field:focus{box-shadow:0 0 0 4px var(--yellow);}
+.inlinef{display:inline-block;width:auto;min-width:90px;max-width:100%;padding:8px 12px;font-size:20px;
+  border-radius:12px;vertical-align:baseline;margin:4px 2px;}
+
+/* sticker badge */
+.badge{position:absolute;font-family:"Manrope";font-weight:800;color:var(--grape);
+  background:var(--mint);border-radius:50px;padding:6px 14px;font-size:13px;letter-spacing:-.01em;
+  box-shadow:0 4px 0 rgba(0,0,0,.2);transform:rotate(-7deg);}
+
+/* ===== response stamp ===== */
+#stamp{position:absolute;inset:0;z-index:40;display:none;align-items:center;justify-content:center;pointer-events:none;}
+#stamp.show{display:flex;}
+#stampText{font-family:"Manrope";font-weight:800;font-size:clamp(40px,15vw,72px);letter-spacing:-.03em;
+  color:var(--grape);background:var(--yellow);padding:18px 30px;border-radius:24px;
+  transform:rotate(-6deg) scale(.4);opacity:0;box-shadow:0 12px 0 rgba(0,0,0,.3);text-align:center;
+  border:5px solid var(--grape);}
+#stamp.show #stampText{animation:slap .62s var(--spring) forwards;}
+@keyframes slap{0%{transform:rotate(-18deg) scale(.3);opacity:0;}
+  35%{transform:rotate(-6deg) scale(1.12);opacity:1;}
+  60%{transform:rotate(-6deg) scale(.98);}80%{transform:rotate(-6deg) scale(1.02);opacity:1;}
+  100%{transform:rotate(-6deg) scale(1);opacity:0;}}
+
+/* ===== welcome value zones ===== */
+#welcome{padding:0;}
+#wTiles{position:absolute;inset:0;z-index:1;display:grid;
+  grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(3,1fr) auto;}
+#wTiles .vz{position:relative;border:1.5px solid rgba(252,238,33,.16);
+  display:flex;align-items:center;justify-content:center;}
+#wTiles .vz .vn{font-family:"Space Grotesk";font-weight:700;font-size:13px;color:rgba(252,238,33,.30);}
+#wTiles .vz.king{grid-column:1/-1;height:84px;background:rgba(255,92,92,.16);
+  border-top:2px solid rgba(252,238,33,.4);}
+#wTiles .vz.king .vn{font-size:15px;color:rgba(255,92,92,.85);letter-spacing:.2em;text-transform:uppercase;}
+/* checkerboard tint */
+#wTiles .vz:nth-child(odd){background:rgba(255,255,255,.035);}
+#wContent{position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;
+  padding:0 26px calc(96px + env(safe-area-inset-bottom));pointer-events:none;}
+#wContent .big{font-family:"Manrope";font-weight:800;letter-spacing:-.05em;line-height:.84;
+  font-size:clamp(72px,26vw,124px);color:var(--yellow);text-shadow:6px 6px 0 var(--coral);
+  max-width:100%;}
+#wContent .wsub{font-family:"Space Grotesk";font-weight:600;font-size:18px;margin-top:18px;color:#fff;
+  background:var(--grape);padding:8px 16px;border-radius:40px;display:inline-block;
+  box-shadow:0 5px 0 rgba(0,0,0,.3);}
+#wContent .tap{margin-top:14px;font-family:"Space Grotesk";font-weight:500;font-size:13px;
+  letter-spacing:.18em;text-transform:uppercase;color:rgba(255,255,255,.6);}
+
+/* ===== gender suit cards ===== */
+.gcard{position:relative;width:100%;border:none;cursor:pointer;background:var(--paper);
+  border-radius:20px;padding:0;overflow:hidden;margin-bottom:14px;
+  box-shadow:0 7px 0 rgba(0,0,0,.28);transition:transform .12s var(--spring),box-shadow .12s;
+  display:flex;}
+.gcard:active{transform:translateY(4px);box-shadow:0 3px 0 rgba(0,0,0,.28);}
+.gquad{flex:1;display:flex;align-items:center;justify-content:center;min-height:74px;
+  border-right:1px dashed rgba(26,5,51,.12);}
+.gquad:last-child{border-right:none;}
+.glabel{position:absolute;left:18px;top:50%;transform:translateY(-50%);font-family:"Manrope";
+  font-weight:800;font-size:22px;color:var(--ink);letter-spacing:-.02em;pointer-events:none;
+  text-shadow:0 1px 0 rgba(255,255,255,.6);}
+
+/* ===== potato ===== */
+#potatoImg{display:block;max-width:62%;margin:0 auto;height:auto;}
+
+/* ===== rank ===== */
+.rankblock{display:flex;align-items:center;gap:10px;background:var(--paper);color:var(--ink);
+  border-radius:14px;padding:11px 14px;margin-bottom:9px;box-shadow:0 4px 0 rgba(0,0,0,.24);
+  font-family:"Manrope";font-weight:800;font-size:15.5px;line-height:1.15;touch-action:none;
+  transition:transform .15s var(--spring),box-shadow .12s;}
+.rankblock .rtxt{flex:1 1 auto;min-width:0;}
+.rankblock.drag{opacity:.92;transform:scale(1.04) rotate(-1.5deg);box-shadow:0 12px 22px rgba(0,0,0,.4);z-index:5;}
+.rankblock .grip{font-size:22px;color:var(--grape2);cursor:grab;}
+.rankblock .arrs{margin-left:auto;display:flex;flex-direction:column;gap:2px;}
+.rankblock .arrs{margin-left:auto;flex:0 0 auto;}
+.rankblock .arrs button{border:none;background:var(--grape);color:#fff;border-radius:7px;width:32px;height:21px;
+  font-size:13px;font-weight:800;cursor:pointer;line-height:1;}
+.rankblock .arrs button:active{transform:scale(.9);}
+
+/* ===== captcha ===== */
+#capGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.capcell{aspect-ratio:1;border:3px solid transparent;border-radius:12px;cursor:pointer;overflow:hidden;
+  background:#1a0533;display:flex;align-items:flex-end;justify-content:center;position:relative;
+  transition:transform .1s var(--spring);}
+.capcell:active{transform:scale(.95);}
+.capcell.sel{border-color:var(--yellow);box-shadow:0 0 0 3px var(--grape);}
+.capcell .scene{position:absolute;inset:0;}
+.capcell .check{position:absolute;top:5px;left:5px;width:22px;height:22px;border-radius:50%;
+  background:var(--yellow);color:var(--grape);font-weight:800;font-size:14px;display:none;
+  align-items:center;justify-content:center;box-shadow:0 2px 4px rgba(0,0,0,.3);}
+.capcell.sel .check{display:flex;}
+
+/* ===== hmmm ===== */
+#hmWord{font-family:"Manrope";font-weight:800;font-size:clamp(40px,16vw,74px);color:var(--yellow);
+  letter-spacing:-.04em;text-align:center;word-break:break-all;line-height:.95;
+  text-shadow:4px 4px 0 var(--coral);}
+
+/* ===== calculating ===== */
+#calc{align-items:center;justify-content:center;text-align:center;}
+#calcNum{font-family:"Manrope";font-weight:800;font-size:clamp(80px,28vw,128px);color:var(--yellow);
+  letter-spacing:-.04em;line-height:1;}
+#calcBar{width:78%;max-width:300px;height:14px;border-radius:50px;background:rgba(255,255,255,.18);
+  overflow:hidden;margin:22px 0;}
+#calcBar>i{display:block;height:100%;width:0;background:var(--mint);border-radius:50px;transition:width .3s linear;}
+#calcStatus{font-family:"Space Grotesk";font-weight:500;font-size:17px;color:#fff;min-height:24px;}
+
+/* ===== reveal ===== */
+#reveal{padding-top:calc(env(safe-area-inset-top) + 16px);}
+#revScroll{flex:1 1 auto;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-right:4px;min-height:0;}
+#revScroll::-webkit-scrollbar{width:0;}
+.revblock{margin-bottom:20px;}
+.revh{font-family:"Space Grotesk";font-weight:700;font-size:12px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--mint);margin-bottom:6px;}
+.revtext{font-family:"Space Grotesk";font-weight:400;font-size:17px;line-height:1.5;color:#fff;
+  background:rgba(26,5,51,.62);border:1px solid rgba(255,255,255,.08);border-radius:14px;
+  padding:12px 14px;backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);}
+.revtext.intro{font-weight:600;font-size:19px;color:var(--yellow);background:rgba(86,17,158,.55);}
+.caret{display:inline-block;width:9px;height:1.1em;background:var(--yellow);vertical-align:-2px;
+  margin-left:2px;animation:blink .8s steps(1) infinite;}
+@keyframes blink{50%{opacity:0;}}
+
+/* playing card */
+#cardStage{display:none;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:10px 0 4px;}
+#cardStage.show{display:flex;}
+.pcard{width:200px;height:288px;background:#fff;border-radius:18px;position:relative;
+  box-shadow:0 18px 50px rgba(0,0,0,.55);transform:scale(.2) rotateY(90deg);
+  animation:cardBloom 1s var(--spring) forwards;border:1px solid #e6e1d4;}
+@keyframes cardBloom{0%{transform:scale(.2) rotateY(90deg) rotate(-12deg);opacity:0;}
+  55%{transform:scale(1.08) rotateY(0) rotate(2deg);opacity:1;}
+  75%{transform:scale(.97) rotate(-1deg);}100%{transform:scale(1) rotate(0);opacity:1;}}
+.pcard .corner{position:absolute;font-family:"Manrope";font-weight:800;line-height:.9;text-align:center;}
+.pcard .corner.tl{top:12px;left:14px;}
+.pcard .corner.br{bottom:12px;right:14px;transform:rotate(180deg);}
+.pcard .corner .v{font-size:30px;}
+.pcard .corner .s{font-size:24px;}
+.pcard .pip{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:96px;line-height:1;}
+.red{color:#E0203A;}.dark{color:#16121f;}
+.revcap{font-family:"Manrope";font-weight:800;font-size:clamp(24px,7vw,34px);color:var(--yellow);
+  margin-top:22px;letter-spacing:-.02em;text-align:center;}
+
+/* footer credit + info */
+.credit{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom) + 8px);z-index:6;
+  text-align:center;font-family:"Space Grotesk";font-weight:500;font-size:11px;
+  color:rgba(255,255,255,.4);letter-spacing:.04em;}
+.credit b{cursor:pointer;}
+#infoBtn{position:absolute;top:calc(env(safe-area-inset-top) + 14px);right:18px;z-index:7;
+  width:34px;height:34px;border-radius:50%;border:2px solid rgba(255,255,255,.4);background:transparent;
+  color:#fff;font-family:"Space Grotesk";font-weight:700;font-size:16px;cursor:pointer;}
+
+/* cheat panel */
+#cheat{position:absolute;inset:0;z-index:80;display:none;align-items:center;justify-content:center;
+  background:rgba(10,2,22,.86);padding:24px;}
+#cheat.show{display:flex;}
+#cheatCard{background:#fff;color:#1A0533;border-radius:18px;padding:20px;max-width:330px;width:100%;
+  font-family:"Space Grotesk";font-weight:500;font-size:13px;line-height:1.5;max-height:88%;overflow:auto;}
+#cheatCard h3{font-family:"Manrope";font-weight:800;margin:0 0 4px;font-size:20px;}
+#cheatCard .armed{font-size:22px;font-weight:800;color:#56119E;margin:8px 0 14px;}
+#cheatCard table{width:100%;border-collapse:collapse;font-size:12px;}
+#cheatCard td{padding:3px 4px;border-bottom:1px solid #eee;}
+#cheatCard .close{margin-top:14px;width:100%;border:none;background:var(--grape);color:#fff;
+  border-radius:12px;padding:12px;font-family:"Manrope";font-weight:800;font-size:15px;cursor:pointer;}
+
+/* info modal */
+#info{position:absolute;inset:0;z-index:70;display:none;align-items:center;justify-content:center;
+  background:rgba(10,2,22,.8);padding:24px;}
+#info.show{display:flex;}
+#info .card{background:var(--paper);color:var(--ink);border-radius:20px;padding:26px;max-width:320px;
+  text-align:center;}
+#info .card h3{font-family:"Manrope";font-weight:800;font-size:24px;margin:0 0 8px;}
+#info .card p{font-family:"Space Grotesk";font-weight:500;font-size:14px;line-height:1.5;margin:0 0 16px;color:rgba(26,5,51,.75);}
+#info .card a{display:inline-block;text-decoration:none;background:var(--coral);color:#fff;font-family:"Manrope";
+  font-weight:800;border-radius:50px;padding:12px 22px;box-shadow:0 5px 0 #c23b3b;}
+#info .card .x{margin-top:14px;font-size:13px;color:rgba(26,5,51,.5);cursor:pointer;font-weight:600;}
+
+@media(prefers-reduced-motion:reduce){
+  *{animation-duration:.001s!important;transition-duration:.05s!important;}
+  .shape{animation:none!important;}
+}
+</style>
+</head>
+<body>
+<div id="wrap">
+<div id="app">
+  <div id="bg"></div>
+
+  <button id="infoBtn" aria-label="About">i</button>
+
+  <!-- ===================== 1. WELCOME ===================== -->
+  <section class="screen active" id="welcome" data-i="0">
+    <div id="wTiles"></div>
+    <div id="wContent">
+      <div class="big stagger" style="display:block"><span style="display:block;animation:pop .6s var(--spring) forwards">SIGNS</span></div>
+      <div class="wsub">your reading starts now</div>
+      <div class="tap">tap anywhere to begin</div>
+    </div>
+  </section>
+
+  <!-- ===================== 2. GENDER (suit) ===================== -->
+  <section class="screen" id="gender" data-i="1">
+    <div class="head stagger">
+      <div class="label">question 01</div>
+      <h1 class="q">What's your<br>gender?</h1>
+    </div>
+    <div class="body stagger" id="gWrap"></div>
+  </section>
+
+  <!-- ===================== 3. STAR SIGN ===================== -->
+  <section class="screen" id="zodiac" data-i="2">
+    <div class="head stagger">
+      <div class="label">question 02</div>
+      <h1 class="q">What's your<br>star sign?</h1>
+    </div>
+    <div class="body"><div class="grid3 stagger" id="zGrid"></div></div>
+  </section>
+
+  <!-- ===================== 4. CHINESE ZODIAC ===================== -->
+  <section class="screen" id="chinese" data-i="3">
+    <div class="head stagger">
+      <div class="label">question 03</div>
+      <h1 class="q">Chinese<br>zodiac?</h1>
+    </div>
+    <div class="body"><div class="grid3 stagger" id="cGrid"></div></div>
+  </section>
+
+  <!-- ===================== 5. POWER RANGER ===================== -->
+  <section class="screen" id="ranger" data-i="4">
+    <div class="head stagger">
+      <div class="label">question 04</div>
+      <h1 class="q">If you were a<br>Power Ranger?</h1>
+    </div>
+    <div class="body"><div class="grid2 stagger" id="rGrid"></div></div>
+  </section>
+
+  <!-- ===================== 6. FEELINGS ===================== -->
+  <section class="screen" id="feelings" data-i="5">
+    <div class="head stagger">
+      <div class="label">question 05</div>
+      <h1 class="q">How do you<br>feel about<br>things?</h1>
+    </div>
+    <div class="body stagger" style="justify-content:flex-start;padding-top:8px">
+      <input class="field" id="feelInput" type="text" autocomplete="off" aria-label="your answer" />
+      <div style="text-align:right;margin-top:14px">
+        <button class="cta" data-next>Continue ›</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== 7. MAD-LIBS ===================== -->
+  <section class="screen" id="madlibs" data-i="6">
+    <div class="head stagger">
+      <div class="label">question 06</div>
+      <h1 class="q" style="font-size:clamp(26px,7.5vw,38px);line-height:1.06">
+        When I am at <input class="field inlinef" id="ml1" placeholder="…" aria-label="place">,
+        I like to <input class="field inlinef" id="ml2" placeholder="…" aria-label="activity">
+        with <input class="field inlinef" id="ml3" placeholder="…" aria-label="who">.
+      </h1>
+    </div>
+    <div class="foot stagger" style="text-align:right;margin-top:14px">
+      <button class="cta coral" data-next>Continue ›</button>
+    </div>
+  </section>
+
+  <!-- ===================== 8. POTATO ===================== -->
+  <section class="screen" id="potato" data-i="7">
+    <div class="head"></div>
+    <div class="body stagger" style="justify-content:flex-start;padding-top:6px;flex:0 0 auto">
+      <img id="potatoImg" loading="lazy" alt="potato"
+        src="https://isometricplayingcards-nralz.wordpress.com/wp-content/uploads/2026/06/potato.png">
+      <div class="grid2" id="pGrid" style="margin-top:18px"></div>
+    </div>
+    <div class="foot"></div>
+  </section>
+
+  <!-- ===================== 9. RANK ===================== -->
+  <section class="screen" id="rank" data-i="8">
+    <div class="head stagger">
+      <div class="label">question 07</div>
+      <h1 class="q">Rank these<br>in order:</h1>
+    </div>
+    <div class="body stagger" style="justify-content:flex-start;padding-top:6px;overflow-y:auto"><div id="rankList"></div></div>
+    <div class="foot stagger" style="text-align:right;margin-top:8px">
+      <button class="cta" data-next>Continue ›</button>
+    </div>
+  </section>
+
+  <!-- ===================== 10. CAPTCHA ===================== -->
+  <section class="screen" id="captcha" data-i="9">
+    <div class="head stagger">
+      <div class="label">verify you're human</div>
+      <h1 class="q" style="font-size:clamp(24px,7vw,34px)">Select all squares with traffic lights</h1>
+    </div>
+    <div class="body"><div id="capGrid" class="stagger"></div></div>
+    <div class="foot stagger" style="text-align:right;margin-top:12px">
+      <button class="cta" data-next>Verify</button>
+    </div>
+  </section>
+
+  <!-- ===================== 11. HMMM ===================== -->
+  <section class="screen" id="hmmm" data-i="10">
+    <div class="head stagger">
+      <div class="label">question 08</div>
+      <h1 class="q">Hmmm?</h1>
+    </div>
+    <div class="body stagger" style="justify-content:center;gap:30px">
+      <div id="hmWord">Hmmm</div>
+      <input type="range" id="hmSlide" min="0" max="10" value="5" step="1" aria-label="hmmm"
+        style="width:100%;accent-color:#FCEE21;height:30px">
+    </div>
+    <div class="foot stagger" style="text-align:right">
+      <button class="cta" data-next>Continue ›</button>
+    </div>
+  </section>
+
+  <!-- ===================== 12. WORM ===================== -->
+  <section class="screen" id="worm" data-i="11">
+    <div class="head stagger">
+      <div class="label">question 09</div>
+      <h1 class="q">If I were a worm,<br>would you still<br>love me?</h1>
+    </div>
+    <div class="body stagger" style="gap:14px;justify-content:center">
+      <button class="opt" data-worm style="font-size:22px;justify-content:center"><span class="em">🪱</span>Yes</button>
+      <button class="opt" data-worm style="font-size:22px;justify-content:center">No</button>
+    </div>
+  </section>
+
+  <!-- ===================== 13. CALCULATING ===================== -->
+  <section class="screen" id="calc" data-i="12">
+    <div class="label" style="text-align:center">reading your chart</div>
+    <div id="calcNum">0%</div>
+    <div id="calcBar"><i></i></div>
+    <div id="calcStatus">Aligning your stars…</div>
+  </section>
+
+  <!-- ===================== 14. REVEAL ===================== -->
+  <section class="screen" id="reveal" data-i="13">
+    <div class="head" style="margin-bottom:10px">
+      <div class="label">your reading</div>
+    </div>
+    <div id="revScroll"></div>
+    <div id="cardStage">
+      <div class="pcard" id="pcard">
+        <div class="corner tl"><div class="v dark" id="cv1">A</div><div class="s dark" id="cs1">♠</div></div>
+        <div class="pip dark" id="cpip">♠</div>
+        <div class="corner br"><div class="v dark" id="cv2">A</div><div class="s dark" id="cs2">♠</div></div>
+      </div>
+      <div class="revcap" id="revCap">You picked the Ace of Spades.</div>
+    </div>
+    <div class="foot" style="text-align:center;margin-top:12px">
+      <button class="cta" id="revNext">Next ›</button>
+    </div>
+  </section>
+
+  <!-- stamp + overlays -->
+  <div id="stamp"><div id="stampText">OK!</div></div>
+
+  <div class="credit"><b id="creditB">@oddpaq</b></div>
+
+  <div id="info"><div class="card">
+    <h3>Signs</h3>
+    <p>A playful astrology reading, just for fun. Built with love.</p>
+    <p style="margin-bottom:18px">A webapp by Kenneth Aidan Foo</p>
+    <a href="https://www.instagram.com/oddpaq" target="_blank" rel="noopener">Follow @oddpaq</a>
+    <div class="x" id="infoX">Close</div>
+  </div></div>
+
+  <div id="cheat"><div id="cheatCard">
+    <h3>Performer cheat-sheet</h3>
+    <div class="armed" id="armedCard">Armed: ...</div>
+    <table id="cheatTbl"></table>
+    <button class="close" id="cheatClose">Close</button>
+  </div></div>
+
+</div>
+</div>
+
+<script>
+(function(){
+"use strict";
+var reduce = window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+/* ---------- background collage ---------- */
+(function buildBG(){
+  var bg=document.getElementById('bg');
+  var palette=['#FCEE21','#FF5C5C','#37E0A6','#56119E','#9b59ff'];
+  function add(html,css){var e=document.createElement('div');e.className='shape';e.style.cssText=css;e.innerHTML=html||'';bg.appendChild(e);return e;}
+  // big blobs
+  add('', 'width:62vmin;height:62vmin;left:-20vmin;top:-16vmin;background:#56119E;'+
+    '--dx:18px;--dy:14px;--dr:14deg;animation:drift 19s ease-in-out infinite;border-radius:48% 52% 56% 44%/52% 46% 54% 48%;opacity:.9;');
+  add('', 'width:46vmin;height:46vmin;right:-16vmin;top:30vh;background:#FF5C5C;opacity:.85;'+
+    '--dx:-16px;--dy:-20px;--dr:-18deg;animation:drift 16s ease-in-out infinite;border-radius:54% 46% 50% 50%/46% 54% 46% 54%;');
+  add('', 'width:40vmin;height:40vmin;left:6vmin;bottom:-16vmin;background:#37E0A6;opacity:.7;'+
+    '--dx:14px;--dy:-12px;--dr:20deg;animation:drift 22s ease-in-out infinite;border-radius:50%;');
+  // rings
+  add('', 'width:30vmin;height:30vmin;right:8vmin;top:8vh;color:#FCEE21;opacity:.5;'+
+    'border:6px solid currentColor;border-radius:50%;background:transparent;animation:spinslow 40s linear infinite;');
+  add('', 'width:18vmin;height:18vmin;left:-6vmin;top:52vh;color:#37E0A6;opacity:.45;'+
+    'border:5px dashed currentColor;border-radius:50%;background:transparent;animation:spinslow 30s linear infinite reverse;');
+  // stars
+  for(var i=0;i<6;i++){
+    var s=add('★','');
+    s.style.cssText='left:'+(8+Math.random()*82)+'%;top:'+(6+Math.random()*86)+'%;'+
+      'color:'+palette[i%palette.length]+';font-size:'+(14+Math.random()*22)+'px;opacity:'+(.35+Math.random()*.4)+';'+
+      'font-weight:800;'+(reduce?'':'animation:drift '+(12+Math.random()*10)+'s ease-in-out infinite;')+
+      '--dx:'+(Math.random()*24-12)+'px;--dy:'+(Math.random()*24-12)+'px;--dr:'+(Math.random()*40-20)+'deg;';
+  }
+  // squiggle (svg)
+  var sq=add('<svg width="120" height="40" viewBox="0 0 120 40"><path d="M4 24 Q20 4 36 24 T68 24 T100 24" fill="none" stroke="#FCEE21" stroke-width="8" stroke-linecap="round"/></svg>','');
+  sq.style.cssText='right:6vmin;bottom:14vh;opacity:.5;'+(reduce?'':'animation:drift 17s ease-in-out infinite;')+'--dx:-12px;--dy:10px;--dr:-10deg;';
+  // dotted arc
+  var arc=add('<svg width="140" height="80" viewBox="0 0 140 80"><path d="M6 74 A70 70 0 0 1 134 74" fill="none" stroke="#FF5C5C" stroke-width="6" stroke-linecap="round" stroke-dasharray="2 16"/></svg>','');
+  arc.style.cssText='left:4vmin;top:4vh;opacity:.55;'+(reduce?'':'animation:drift 21s ease-in-out infinite;')+'--dx:8px;--dy:8px;--dr:8deg;';
+})();
+
+/* ---------- card data ---------- */
+var VALUES=['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+var VALNAMES=['Ace','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Jack','Queen','King'];
+var SUITS=[{k:'Clubs',sym:'♣',red:false},{k:'Hearts',sym:'♥',red:true},{k:'Spades',sym:'♠',red:false},{k:'Diamonds',sym:'♦',red:true}];
+var captured={valueIdx:6, suitIdx:2}; // sensible default = 7 of Spades for centre tapping
+
+/* ---------- screen routing ---------- */
+var screens=Array.prototype.slice.call(document.querySelectorAll('.screen'));
+var BOOT=0; // <-- change to inspect a screen, then revert to 0
+var cur=BOOT;
+function showStagger(scr){
+  var items=scr.querySelectorAll('.stagger>*');
+  items.forEach(function(el,i){
+    el.style.animation='none';
+    /* reflow */ void el.offsetWidth;
+    el.style.animation='';
+    el.style.animationDelay=(reduce?0:i*0.085)+'s';
+  });
+}
+function go(idx){
+  if(idx===cur) return;
+  var from=screens[cur], to=screens[idx];
+  from.classList.add('leave');
+  setTimeout(function(){
+    from.classList.remove('active','leave','enter');
+    to.classList.add('active','enter');
+    showStagger(to);
+    cur=idx;
+    onEnter(idx);
+    setTimeout(function(){to.classList.remove('enter');},460);
+  }, reduce?10:230);
+}
+// init boot screen
+screens.forEach(function(s,i){s.classList.toggle('active',i===BOOT);});
+document.getElementById('app').classList.add('s-active');
+showStagger(screens[BOOT]);
+
+/* ---------- response stamp ---------- */
+var stamp=document.getElementById('stamp'), stampText=document.getElementById('stampText');
+function fireStamp(txt, then){
+  stampText.textContent=txt;
+  stamp.classList.add('show');
+  var done=false;
+  function finish(){ if(done)return; done=true; stamp.classList.remove('show'); if(then)then(); }
+  if(reduce){ setTimeout(finish,180); return; }
+  setTimeout(finish,650);
+}
+function answer(stampTxt, nextIdx){
+  fireStamp(stampTxt, function(){ if(nextIdx!=null) go(nextIdx); });
+}
+
+/* ===================== 1. WELCOME value zones ===================== */
+(function welcomeInit(){
+  var t=document.getElementById('wTiles');
+  // 12 grid zones (A..Q)
+  for(var i=0;i<12;i++){
+    var z=document.createElement('div');
+    z.className='vz';
+    z.dataset.v=i;
+    t.appendChild(z);
+  }
+  // king bar (no visible label)
+  var k=document.createElement('div');
+  k.className='vz king'; k.dataset.v=12;
+  t.appendChild(k);
+
+  function tapZone(v){
+    captured.valueIdx=v;
+    updateCheat();
+    answer('LET\'S GO!',1);
+  }
+  // whole screen tappable: delegate on welcome section
+  document.getElementById('welcome').addEventListener('click',function(e){
+    var zone=e.target.closest('.vz');
+    var v = zone? parseInt(zone.dataset.v,10) : 6; // centre default if somehow no zone
+    tapZone(isNaN(v)?6:v);
+  });
+})();
+
+/* ===================== 2. GENDER suit cards ===================== */
+(function genderInit(){
+  var wrap=document.getElementById('gWrap');
+  var genders=['Male','Female','Other'];
+  genders.forEach(function(g){
+    var card=document.createElement('button');
+    card.className='gcard';
+    card.setAttribute('aria-label',g);
+    var lab=document.createElement('span'); lab.className='glabel'; lab.textContent=g; card.appendChild(lab);
+    for(var q=0;q<4;q++){
+      var quad=document.createElement('span');
+      quad.className='gquad'; quad.dataset.suit=q;
+      card.appendChild(quad);
+    }
+    card.addEventListener('click',function(e){
+      var quad=e.target.closest('.gquad');
+      var s = quad? parseInt(quad.dataset.suit,10) : 1; // centre-ish default Hearts
+      if(isNaN(s)) s=1;
+      captured.suitIdx=s; updateCheat();
+      answer('OK!',2);
+    });
+    wrap.appendChild(card);
+  });
+})();
+
+/* ===================== 3. STAR SIGN ===================== */
+var ZODIAC=[
+  ['Aries','♈'],['Taurus','♉'],['Gemini','♊'],['Cancer','♋'],
+  ['Leo','♌'],['Virgo','♍'],['Libra','♎'],['Scorpio','♏'],
+  ['Sagittarius','♐'],['Capricorn','♑'],['Aquarius','♒'],['Pisces','♓']
+];
+var chosenSign={name:'Aries',glyph:'♈'};
+(function zInit(){
+  var g=document.getElementById('zGrid');
+  ZODIAC.forEach(function(z){
+    var b=document.createElement('button'); b.className='tile';
+    b.innerHTML='<span class="gl">'+z[1]+'</span><span class="nm">'+z[0]+'</span>';
+    b.addEventListener('click',function(){ chosenSign={name:z[0],glyph:z[1]}; answer('Great!',3); });
+    g.appendChild(b);
+  });
+})();
+
+/* ===================== 4. CHINESE ZODIAC ===================== */
+var ANIMALS=[['Rat','🐀'],['Ox','🐂'],['Tiger','🐅'],['Rabbit','🐇'],['Dragon','🐉'],['Snake','🐍'],
+  ['Horse','🐎'],['Goat','🐐'],['Monkey','🐒'],['Rooster','🐓'],['Dog','🐕'],['Pig','🐖']];
+(function cInit(){
+  var g=document.getElementById('cGrid');
+  ANIMALS.forEach(function(a){
+    var b=document.createElement('button'); b.className='tile';
+    b.innerHTML='<span class="gl">'+a[1]+'</span><span class="nm">'+a[0]+'</span>';
+    b.addEventListener('click',function(){ answer('很好!',4); });
+    g.appendChild(b);
+  });
+})();
+
+/* ===================== 5. POWER RANGER ===================== */
+var RANGERS=[['Red','#FF5C5C'],['Blue','#3786FF'],['Black','#2A2233'],['Yellow','#FCEE21'],['Pink','#FF7AD0'],['Green','#37E0A6']];
+(function rInit(){
+  var g=document.getElementById('rGrid');
+  RANGERS.forEach(function(r){
+    var b=document.createElement('button'); b.className='opt';
+    b.style.justifyContent='flex-start';
+    var dotC = r[1];
+    b.innerHTML='<span style="width:26px;height:26px;border-radius:50%;background:'+dotC+';display:inline-block;box-shadow:inset 0 0 0 2px rgba(0,0,0,.18)"></span>'+r[0];
+    b.addEventListener('click',function(){ answer('Strong Choice!',5); });
+    g.appendChild(b);
+  });
+})();
+
+/* ===================== 6. FEELINGS ===================== */
+document.querySelector('#feelings [data-next]').addEventListener('click',function(){ answer('Noted.',6); });
+
+/* ===================== 7. MAD-LIBS ===================== */
+document.querySelector('#madlibs [data-next]').addEventListener('click',function(){ answer('Insightful!',7); });
+
+/* ===================== 8. POTATO ===================== */
+(function pInit(){
+  var g=document.getElementById('pGrid');
+  ['Yes','No','Sometimes',"I don't know what to do here"].forEach(function(t,i){
+    var b=document.createElement('button'); b.className='opt';
+    b.style.justifyContent='center'; b.style.textAlign='center'; b.style.fontSize=i===3?'14px':'18px';
+    if(i===3) b.style.gridColumn='1 / -1';
+    b.textContent=t;
+    b.addEventListener('click',function(){ answer('Interesting…',8); });
+    g.appendChild(b);
+  });
+})();
+
+/* ===================== 9. RANK (pointer reorder) ===================== */
+(function rankInit(){
+  var list=document.getElementById('rankList');
+  var items=['Pizza','2.592','The letter P','Ranking things','The rain on your skin (no one else can feel it for you)'];
+  function render(){
+    list.innerHTML='';
+    items.forEach(function(txt,i){
+      var row=document.createElement('div'); row.className='rankblock'; row.dataset.idx=i;
+      row.innerHTML='<span class="grip">⠿</span><span class="rtxt">'+txt+'</span>'+
+        '<span class="arrs"><button data-up aria-label="move up">▲</button><button data-dn aria-label="move down">▼</button></span>';
+      row.querySelector('[data-up]').addEventListener('click',function(e){e.stopPropagation();if(i>0){var t=items[i-1];items[i-1]=items[i];items[i]=t;render();}});
+      row.querySelector('[data-dn]').addEventListener('click',function(e){e.stopPropagation();if(i<items.length-1){var t=items[i+1];items[i+1]=items[i];items[i]=t;render();}});
+      attachDrag(row);
+      list.appendChild(row);
+    });
+  }
+  var dragEl=null,startY=0,startIdx=0,curIdx=0;
+  function attachDrag(row){
+    row.addEventListener('pointerdown',function(e){
+      if(e.target.closest('button')) return;
+      dragEl=row; startY=e.clientY; startIdx=curIdx=parseInt(row.dataset.idx,10);
+      row.classList.add('drag'); row.setPointerCapture(e.pointerId);
+    });
+  }
+  list.addEventListener('pointermove',function(e){
+    if(!dragEl) return;
+    var dy=e.clientY-startY;
+    dragEl.style.transform='translateY('+dy+'px) scale(1.04) rotate(-1.5deg)';
+    var rowH=dragEl.offsetHeight+12;
+    var newIdx=Math.max(0,Math.min(items.length-1,startIdx+Math.round(dy/rowH)));
+    if(newIdx!==curIdx){
+      var moved=items.splice(startIdx,1)[0];
+      items.splice(newIdx,0,moved);
+      startIdx=newIdx; curIdx=newIdx; startY=e.clientY;
+      render();
+      dragEl=list.querySelector('[data-idx="'+newIdx+'"]');
+      dragEl.classList.add('drag');
+      try{dragEl.setPointerCapture(e.pointerId);}catch(_){}
+    }
+  });
+  function endDrag(){ if(dragEl){dragEl.classList.remove('drag');dragEl.style.transform='';dragEl=null;} }
+  list.addEventListener('pointerup',endDrag);
+  list.addEventListener('pointercancel',endDrag);
+  render();
+  document.querySelector('#rank [data-next]').addEventListener('click',function(){ answer('Bold ranking!',9); });
+})();
+
+/* ===================== 10. CAPTCHA ===================== */
+(function capInit(){
+  var g=document.getElementById('capGrid');
+  // The 3x3 grid reassembles ONE image: each cell shows a slice of the same
+  // picture via background-size:300% 300% + per-cell background-position.
+  // Production: public/img/captcha.png. Mockup loads the hosted screenshot.
+  var IMG='https://isometricplayingcards-nralz.wordpress.com/wp-content/uploads/2026/06/screenshot-2026-06-27-at-12.39.27-am.png';
+  for(var i=0;i<9;i++){
+    var cell=document.createElement('div'); cell.className='capcell';
+    var col=i%3, rowN=Math.floor(i/3);
+    var scene=document.createElement('div'); scene.className='scene';
+    scene.style.cssText='background-image:url('+IMG+');background-size:300% 300%;'+
+      'background-position:'+(col*50)+'% '+(rowN*50)+'%;background-repeat:no-repeat;';
+    cell.appendChild(scene);
+    var ck=document.createElement('span'); ck.className='check'; ck.textContent='✓'; cell.appendChild(ck);
+    cell.addEventListener('click',function(){ this.classList.toggle('sel'); });
+    g.appendChild(cell);
+  }
+  // Verify accepts any selection and advances.
+  document.querySelector('#captcha [data-next]').addEventListener('click',function(){ answer('Are you sure...?',10); });
+})();
+
+/* ===================== 11. HMMM ===================== */
+(function hmInit(){
+  var slide=document.getElementById('hmSlide'), word=document.getElementById('hmWord');
+  function upd(){
+    var v=parseInt(slide.value,10); // 0..10, centre 5
+    var ms = v===0?0 : Math.max(1, Math.round(v*1.4));
+    word.textContent='H'+'m'.repeat(Math.max(1,ms+1));
+  }
+  slide.addEventListener('input',upd); upd();
+  document.querySelector('#hmmm [data-next]').addEventListener('click',function(){ answer('Hmmmm.',11); });
+})();
+
+/* ===================== 12. WORM ===================== */
+document.querySelectorAll('#worm [data-worm]').forEach(function(b){
+  b.addEventListener('click',function(){ answer('okay...',12); });
+});
+
+/* ===================== 13. CALCULATING ===================== */
+function runCalc(){
+  var num=document.getElementById('calcNum'), bar=document.querySelector('#calcBar>i'),
+      stat=document.getElementById('calcStatus');
+  var lines=['Aligning your stars…','Consulting the aether…','Cross-referencing your sign…','Shuffling the deck of fate…'];
+  var p=0, li=0, dur=reduce?900:4200, t0=performance.now();
+  stat.textContent=lines[0];
+  var statTimer=setInterval(function(){ li=(li+1)%lines.length; stat.textContent=lines[li]; }, reduce?300:1000);
+  function tick(now){
+    var k=Math.min(1,(now-t0)/dur);
+    var disp=Math.round(k*100*(0.6+0.4*k)); if(disp>100)disp=100;
+    p=Math.round(k*100);
+    num.textContent=p+'%'; bar.style.width=p+'%';
+    if(k<1){ requestAnimationFrame(tick); }
+    else { clearInterval(statTimer); setTimeout(function(){ buildReveal(); go(13); }, 350); }
+  }
+  requestAnimationFrame(tick);
+}
+
+/* ===================== 14. REVEAL ===================== */
+var SECTIONS=[
+ {h:'Inner World',o:[
+  "You possess a depth of feeling that you don't always show the world. While you may appear composed on the surface, you harbor rich emotional landscapes and profound thoughts that guide your decisions in subtle ways.",
+  "There is an inner conflict within you between your desire for stability and your yearning for growth. You often find yourself contemplating the deeper meaning of life's events, seeking authenticity in a world that demands conformity.",
+  "You have a reflective nature that others might misinterpret as indecision. In truth, you're processing multiple perspectives simultaneously, which gives you wisdom that many fail to recognize until later.",
+  "Your inner world is more complex than most people realize. You contain contradictions that don't bother you the way they seem to trouble others. You've learned to hold opposing truths without needing to resolve them.",
+  "You experience emotions intensely, though you may not always express them openly. This internal richness makes you sensitive to nuance and subtlety in ways that others miss entirely."]},
+ {h:'Outer Relationships',o:[
+  "People are drawn to you because you listen more than you speak. Your genuine interest in others creates a sense of being understood, though sometimes people take more from you than you realize.",
+  "You value loyalty deeply and expect the same in return. While you're capable of great warmth and connection, you've learned through experience that not everyone deserves access to your inner circle.",
+  "Your relationships tend to follow a pattern of intense connection followed by periods of distance. This rhythm is natural to you, though others sometimes misinterpret it as rejection rather than your need for personal renewal.",
+  "You are someone who adapts to fit the needs of those around you, often becoming what others need you to be. This flexibility is both your strength and your burden, as it can leave you feeling unseen in your relationships.",
+  "You have a small circle of truly meaningful relationships rather than many superficial ones. You're selective about who you let into your world, and this discernment protects you from wasting emotional energy."]},
+ {h:'Aptitudes',o:[
+  "You have untapped potential in creative or intuitive areas that you haven't fully explored. Your practical skills mask a capacity for abstract thinking that could flourish with the right opportunity.",
+  "You excel at tasks requiring attention to detail, though you're also capable of seeing the bigger picture. Your challenge is knowing when to focus narrowly and when to step back for perspective.",
+  "You possess a natural ability to learn new things when they genuinely interest you. However, you may struggle with pursuits that don't align with your intrinsic motivation, no matter how much external pressure is applied.",
+  "You have a talent for understanding how systems work, whether they're organizational, mechanical, or social. This analytical ability, combined with your intuitive nature, makes you particularly suited to roles requiring both logic and insight.",
+  "Your greatest aptitude lies in connecting disparate ideas and seeing patterns others miss. You're a synthesizer at heart, able to pull threads from many sources and weave them into something coherent."]},
+ {h:'Habits',o:[
+  "You have patterns of behavior that serve you well in some contexts but hold you back in others. You're aware of these tendencies but change is difficult because they've become comfortable.",
+  "You tend toward procrastination on things you dislike, yet show remarkable discipline when pursuing goals you care about. This inconsistency often leaves you frustrated with yourself.",
+  "You're someone who thrives with routine but also needs novelty to stay engaged. You often find yourself torn between the comfort of your established patterns and the excitement of trying something entirely new.",
+  "You have a habit of overthinking decisions before you act, sometimes missing windows of opportunity. Yet this caution has also saved you from mistakes that impulsive people often make.",
+  "You tend to be harder on yourself than you are on others, holding yourself to standards that few could realistically meet. This self-criticism drives improvement but can also prevent you from celebrating your accomplishments."]},
+ {h:'Life Purpose / Destiny',o:[
+  "You are meant to experience a journey of self-discovery that will eventually guide others. Your path involves learning hard lessons that later become your greatest gifts to share with the world.",
+  "Your destiny involves finding balance between service to others and honoring your own needs. The universe is guiding you toward a role where your unique perspective becomes invaluable to those around you.",
+  "You are here to challenge the status quo in subtle but meaningful ways. Your life's work, whether recognized or not, involves questioning assumptions and encouraging others to think more deeply about their choices.",
+  "You are being called toward authenticity. Your life's journey is fundamentally about stripping away what others expect of you and discovering who you truly are beneath those layers.",
+  "Your purpose involves transformation, both your own and that of those you encounter. You're meant to be a catalyst for change, helping others see possibilities they couldn't perceive before."]},
+ {h:'Challenges / Obstacles',o:[
+  "Your greatest challenge is self-doubt disguised as practicality. You often talk yourself out of pursuing meaningful things by convincing yourself they're unrealistic, when the real barrier is fear of failure.",
+  "You struggle with the tension between wanting to please others and honoring your own truth. This internal conflict often leaves you feeling exhausted and resentful, even when you're succeeding by external measures.",
+  "You have a tendency to take on too much responsibility, both for your own outcomes and for the feelings of those around you. Learning to distinguish between what you can control and what you cannot is essential to your growth.",
+  "Your challenge is accepting that you cannot be everything to everyone. You must learn to set boundaries without feeling guilty, and to understand that saying no to some things is necessary to say yes to what truly matters.",
+  "You struggle with the gap between your potential and your current circumstances. This awareness can fuel growth, but it can also create frustration and impatience with the pace of your own development."]}
+];
+var CONCLUSION="It's very interesting doing your reading. You are certainly bright, and open to life's possibilities, something not normally found among achieving people. You would do well to be less self-absorbed, as it tends to distance you a little. You could let people in a little more, but I am aware there is a side you feel you should hide, but you really have an appealing personality, and also...";
+
+function ordinalWord(n){
+  var ones=['zero','first','second','third','fourth','fifth','sixth','seventh','eighth','ninth','tenth',
+    'eleventh','twelfth','thirteenth','fourteenth','fifteenth','sixteenth','seventeenth','eighteenth','nineteenth','twentieth'];
+  var tens={20:'twentieth',30:'thirtieth'};
+  if(n<=20) return ones[n];
+  var t=Math.floor(n/10)*10, r=n%10;
+  if(r===0) return tens[t]||ones[n];
+  var tensWord={20:'twenty',30:'thirty'}[t];
+  return tensWord+'-'+ones[r];
+}
+function readingDate(){
+  var d=new Date();
+  var months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  return 'the '+ordinalWord(d.getDate())+' day of '+months[d.getMonth()];
+}
+
+var revBlocks=[], revIdx=0;
+function buildReveal(){
+  var suit=SUITS[captured.suitIdx], val=VALNAMES[captured.valueIdx];
+  revBlocks=[];
+  revBlocks.push({h:'Intro',cls:'intro',text:'Hello '+chosenSign.name+'. Welcome to your astrology reading on '+readingDate()+'. Here is your reading...'});
+  SECTIONS.forEach(function(s){
+    var opt=s.o[Math.floor(Math.random()*s.o.length)];
+    revBlocks.push({h:s.h,cls:'',text:opt});
+  });
+  revBlocks.push({h:'In Conclusion',cls:'',text:CONCLUSION});
+  // prep card visuals
+  setCard(val,suit);
+  // reset scroll/state
+  var sc=document.getElementById('revScroll'); sc.innerHTML='';
+  document.getElementById('cardStage').classList.remove('show');
+  document.getElementById('revNext').style.display='';
+  document.getElementById('revNext').textContent='Begin ›';
+  revIdx=0;
+}
+function setCard(val,suit){
+  document.getElementById('cv1').textContent=val==='10'?'10':VALUES[captured.valueIdx];
+  document.getElementById('cv2').textContent=val==='10'?'10':VALUES[captured.valueIdx];
+  document.getElementById('cs1').textContent=suit.sym;
+  document.getElementById('cs2').textContent=suit.sym;
+  document.getElementById('cpip').textContent=suit.sym;
+  var cls=suit.red?'red':'dark';
+  ['cv1','cs1','cv2','cs2','cpip'].forEach(function(id){
+    var el=document.getElementById(id); el.classList.remove('red','dark'); el.classList.add(cls);
+  });
+  document.getElementById('revCap').textContent='You picked the '+val+' of '+suit.k+'.';
+}
+
+var typing=false;
+function typeBlock(block, done){
+  var sc=document.getElementById('revScroll');
+  // CR11: only the current/most-recent section shows a caret.
+  // Strip any caret left behind on previously-typed sections.
+  Array.prototype.forEach.call(sc.querySelectorAll('.caret'),function(c){c.remove();});
+  var wrap=document.createElement('div'); wrap.className='revblock';
+  var h=document.createElement('div'); h.className='revh'; h.textContent=block.h;
+  var p=document.createElement('div'); p.className='revtext '+(block.cls||'');
+  var caret=document.createElement('span'); caret.className='caret';
+  wrap.appendChild(h); wrap.appendChild(p); p.appendChild(caret); sc.appendChild(wrap);
+  sc.scrollTop=sc.scrollHeight;
+  typing=true;
+  var txt=block.text, i=0;
+  var speed=reduce?0:14;
+  function step(){
+    i+=2;
+    if(i>=txt.length){               // always terminates (odd lengths overshoot, clamp + finish)
+      p.textContent=txt; p.appendChild(caret);
+      sc.scrollTop=sc.scrollHeight; typing=false; if(done)done(); return;
+    }
+    p.textContent=txt.slice(0,i); p.appendChild(caret);
+    sc.scrollTop=sc.scrollHeight; setTimeout(step,speed);
+  }
+  if(reduce){ p.textContent=txt; typing=false; if(done)done(); }
+  else step();
+}
+
+document.getElementById('revNext').addEventListener('click',function(){
+  if(typing) return;
+  if(revIdx>=revBlocks.length){
+    // reveal card
+    showCard();
+    return;
+  }
+  var block=revBlocks[revIdx++];
+  var btn=this; btn.textContent='Next ›';
+  typeBlock(block, function(){
+    if(revIdx>=revBlocks.length){ btn.textContent='and also...'; }
+  });
+});
+
+function showCard(){
+  // remove the trailing caret from the last typed section
+  var sc=document.getElementById('revScroll');
+  Array.prototype.forEach.call(sc.querySelectorAll('.caret'),function(c){c.remove();});
+  document.getElementById('revNext').style.display='none';
+  var stage=document.getElementById('cardStage');
+  stage.classList.add('show');
+  // re-trigger bloom
+  var pc=document.getElementById('pcard'); pc.style.animation='none'; void pc.offsetWidth; pc.style.animation='';
+  // confetti + orbiting stars burst
+  burstConfetti();
+  document.getElementById('revScroll').scrollTop=document.getElementById('revScroll').scrollHeight;
+}
+function burstConfetti(){
+  if(reduce) return;
+  var host=document.getElementById('reveal');
+  var cols=['#FCEE21','#FF5C5C','#37E0A6','#9b59ff','#fff'];
+  for(var i=0;i<26;i++){
+    (function(i){
+      var c=document.createElement('div');
+      var size=6+Math.random()*8;
+      c.style.cssText='position:absolute;z-index:50;left:50%;top:42%;width:'+size+'px;height:'+size+'px;'+
+        'background:'+cols[i%cols.length]+';border-radius:'+(Math.random()<.5?'50%':'2px')+';pointer-events:none;';
+      host.appendChild(c);
+      var ang=Math.random()*Math.PI*2, dist=80+Math.random()*150;
+      var dx=Math.cos(ang)*dist, dy=Math.sin(ang)*dist-40;
+      c.animate([
+        {transform:'translate(-50%,-50%) rotate(0)',opacity:1},
+        {transform:'translate(calc(-50% + '+dx+'px),calc(-50% + '+(dy+220)+'px)) rotate('+(Math.random()*720-360)+'deg)',opacity:0}
+      ],{duration:1400+Math.random()*600,easing:'cubic-bezier(.2,.6,.3,1)',fill:'forwards'});
+      setTimeout(function(){c.remove();},2100);
+    })(i);
+  }
+}
+
+/* ---------- onEnter hooks ---------- */
+function onEnter(idx){
+  var id=screens[idx].id;
+  if(id==='calc') runCalc();
+  if(id==='feelings') setTimeout(function(){try{document.getElementById('feelInput').focus({preventScroll:true});}catch(_){}}, reduce?0:500);
+}
+
+/* ===================== generic data-next not wired above? ensure all covered ===================== */
+/* (each handled individually above) */
+
+/* ===================== CHEAT SHEET (triple tap credit) ===================== */
+var tapCount=0, tapTimer=null;
+document.getElementById('creditB').addEventListener('click',function(e){
+  e.stopPropagation();
+  tapCount++;
+  clearTimeout(tapTimer);
+  tapTimer=setTimeout(function(){tapCount=0;},600);
+  if(tapCount>=3){ tapCount=0; openCheat(); }
+});
+function buildCheatMaps(){
+  var tbl=document.getElementById('cheatTbl');
+  var rows='';
+  rows+='<tr><td colspan="2" style="font-weight:800;color:#56119E">VALUE: welcome zones (4x3 + King bar)</td></tr>';
+  rows+='<tr><td>Row 1</td><td>A · 2 · 3 · 4</td></tr>';
+  rows+='<tr><td>Row 2</td><td>5 · 6 · 7 · 8</td></tr>';
+  rows+='<tr><td>Row 3</td><td>9 · 10 · J · Q</td></tr>';
+  rows+='<tr><td>Bottom bar</td><td>King</td></tr>';
+  rows+='<tr><td colspan="2" style="font-weight:800;color:#56119E;padding-top:10px">SUIT: gender card quarters (L to R)</td></tr>';
+  rows+='<tr><td>Q1 ♣</td><td>Clubs</td></tr>';
+  rows+='<tr><td>Q2 ♥</td><td>Hearts</td></tr>';
+  rows+='<tr><td>Q3 ♠</td><td>Spades</td></tr>';
+  rows+='<tr><td>Q4 ♦</td><td>Diamonds (CHaSeD)</td></tr>';
+  tbl.innerHTML=rows;
+}
+function updateCheat(){
+  var el=document.getElementById('armedCard');
+  if(el) el.textContent='Armed: '+VALNAMES[captured.valueIdx]+' of '+SUITS[captured.suitIdx].k;
+}
+function openCheat(){ buildCheatMaps(); updateCheat(); document.getElementById('cheat').classList.add('show'); }
+document.getElementById('cheatClose').addEventListener('click',function(){ document.getElementById('cheat').classList.remove('show'); });
+updateCheat();
+
+/* ===================== INFO MODAL ===================== */
+document.getElementById('infoBtn').addEventListener('click',function(){ document.getElementById('info').classList.add('show'); });
+document.getElementById('infoX').addEventListener('click',function(){ document.getElementById('info').classList.remove('show'); });
+
+})();
+</script>
+</body>
+</html>

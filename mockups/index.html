@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Signs — Design Mockups</title>
+<style>
+  :root{
+    --bg:#0c0c12; --panel:#15151f; --line:#2a2a3a; --ink:#f4f2ff; --dim:#9a98b4;
+    --accent:#5b54ff;
+    --font:"Inter",ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html,body{background:var(--bg);color:var(--ink);font-family:var(--font);
+    -webkit-font-smoothing:antialiased;}
+  body{padding:36px clamp(16px,4vw,56px) 90px;}
+  header{max-width:1500px;margin:0 auto 18px;}
+  .kicker{font-size:12px;letter-spacing:.32em;text-transform:uppercase;color:var(--dim);
+    font-weight:700;margin-bottom:10px;}
+  h1{font-size:clamp(28px,5vw,46px);font-weight:800;letter-spacing:-.02em;line-height:1;}
+  .lede{margin-top:12px;color:var(--dim);font-size:15px;max-width:70ch;line-height:1.6;}
+  .sec{max-width:1500px;margin:42px auto 0;}
+  .sec-head{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;
+    border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:24px;}
+  .sec-head h2{font-size:20px;font-weight:800;letter-spacing:-.01em;}
+  .sec-head .meta{font-size:13px;color:var(--dim);}
+  .grid{display:grid;gap:24px;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:22px;
+    padding:18px 18px 20px;display:flex;flex-direction:column;position:relative;}
+  .card.spot{border-color:#4b46c9;box-shadow:0 0 0 1px #4b46c9, 0 18px 50px -24px #4b46c9;}
+  .card .top{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:4px;}
+  .num{font-size:12px;font-weight:800;color:var(--dim);letter-spacing:.1em;}
+  .card h3{font-size:21px;font-weight:800;letter-spacing:-.01em;}
+  .badge{display:inline-block;font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;
+    color:#fff;background:var(--accent);padding:3px 8px;border-radius:999px;margin-left:8px;vertical-align:middle;}
+  .badge.fav{background:#e0a82e;color:#1a1404;}
+  .tag{font-size:12.5px;color:var(--dim);line-height:1.5;margin:6px 0 14px;min-height:3.2em;}
+  .frame{position:relative;width:100%;aspect-ratio:390/844;border-radius:28px;overflow:hidden;
+    border:1px solid var(--line);background:#000;box-shadow:0 18px 50px -20px rgba(0,0,0,.8);}
+  .frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;}
+  .actions{margin-top:14px;display:flex;gap:10px;}
+  .actions a{flex:1;text-align:center;text-decoration:none;font-size:13px;font-weight:700;
+    padding:11px 12px;border-radius:12px;border:1px solid var(--line);color:var(--ink);
+    background:#1d1d2a;transition:background .15s,transform .08s,border-color .15s;}
+  .actions a:hover{background:#26263a;border-color:#3a3a52;}
+  .actions a:active{transform:translateY(1px);}
+  .actions a.primary{background:var(--accent);border-color:var(--accent);}
+  .actions a.primary:hover{background:#6e67ff;}
+  footer{max-width:1500px;margin:48px auto 0;color:var(--dim);font-size:12.5px;
+    border-top:1px solid var(--line);padding-top:18px;line-height:1.7;}
+  footer a{color:var(--dim);}
+  .hint{display:inline-block;margin-top:8px;padding:4px 10px;border:1px solid var(--line);
+    border-radius:999px;font-size:11.5px;color:var(--dim);}
+</style>
+</head>
+<body>
+  <header>
+    <div class="kicker">Signs · Astrology Reading</div>
+    <h1>Design mockups</h1>
+    <p class="lede">Round 2 are the new <b>Spotify-Wrapped</b> takes built to the latest brief — loud
+      saturated duotones, oversized type, springy stagger motion, one idea per screen — and they carry
+      the full updated reading (6 sections × 5 options) and all four new question types (feelings box,
+      potato, drag-rank, the “Hmmm?” slider). The chosen one gets rebuilt as the real React + Vite +
+      Framer Motion + Tailwind project. Round 1 are the earlier explorations.</p>
+    <span class="hint">Tip: each phone is live — play the whole quiz. Triple-tap the footer credit inside any mockup for the performer cheat-sheet.</span>
+  </header>
+
+  <section class="sec">
+    <div class="sec-head">
+      <h2>Round 2 — Spotify Wrapped</h2>
+      <span class="meta">the current direction · full updated content + new questions</span>
+    </div>
+    <div class="grid">
+      <div class="card spot">
+        <div class="top"><h3>Pulse</h3><span class="num">05</span></div>
+        <div class="tag">Pure loud Wrapped — per-screen flat duotones (lime/black, pink, cobalt…),
+          ultra-heavy grotesque, snappy springs, confetti stamps. The most literal Wrapped read.</div>
+        <div class="frame"><iframe src="5-pulse.html" title="Pulse" loading="lazy"></iframe></div>
+        <div class="actions"><a class="primary" href="5-pulse.html" target="_blank" rel="noopener">Open fullscreen ↗</a></div>
+      </div>
+      <div class="card spot">
+        <div class="top"><h3>Orbit</h3><span class="num">06</span></div>
+        <div class="tag">Collage-maximalist Wrapped — deep grape + acid yellow + coral, drifting blobs,
+          orbiting stars, squiggles, sticker-slap stamps. Playful and organic.</div>
+        <div class="frame"><iframe src="6-orbit.html" title="Orbit" loading="lazy"></iframe></div>
+        <div class="actions"><a class="primary" href="6-orbit.html" target="_blank" rel="noopener">Open fullscreen ↗</a></div>
+      </div>
+      <div class="card spot">
+        <div class="top"><h3>Press Play</h3><span class="num">07</span></div>
+        <div class="tag">Editorial × Wrapped — your “Celestial Press” feel made loud &amp; kinetic:
+          saturated colour-field tiles, cream panel, mono eyebrows, set numerals, print-offset type.</div>
+        <div class="frame"><iframe src="7-pressplay.html" title="Press Play" loading="lazy"></iframe></div>
+        <div class="actions"><a class="primary" href="7-pressplay.html" target="_blank" rel="noopener">Open fullscreen ↗</a></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-head">
+      <h2>Round 1 — first explorations</h2>
+      <span class="meta">earlier looks (original reading content)</span>
+    </div>
+    <div class="grid">
+      <div class="card">
+        <div class="top"><h3>Aura</h3><span class="num">01</span></div>
+        <div class="tag">Spotify-Wrapped maximalism — shifting gradients, giant type, confetti stamps.</div>
+        <div class="frame"><iframe src="1-aura.html" title="Aura" loading="lazy"></iframe></div>
+        <div class="actions"><a class="primary" href="1-aura.html" target="_blank" rel="noopener">Open fullscreen ↗</a></div>
+      </div>
+      <div class="card">
+        <div class="top"><h3>Stardust</h3><span class="num">02</span></div>
+        <div class="tag">Y2K holographic cyber-mystic — chrome foil, sparkle, retro “loading…”.</div>
+        <div class="frame"><iframe src="2-stardust.html" title="Stardust" loading="lazy"></iframe></div>
+        <div class="actions"><a class="primary" href="2-stardust.html" target="_blank" rel="noopener">Open fullscreen ↗</a></div>
+      </div>
+      <div class="card">
+        <div class="top"><h3>Celestial Press <span class="badge fav">your top pick</span></h3><span class="num">03</span></div>
+        <div class="tag">Editorial risograph zine — cream paper, two-ink print, big serif, tarot framing.</div>
+        <div class="frame"><iframe src="3-press.html" title="Celestial Press" loading="lazy"></iframe></div>
+        <div class="actions"><a class="primary" href="3-press.html" target="_blank" rel="noopener">Open fullscreen ↗</a></div>
+      </div>
+      <div class="card">
+        <div class="top"><h3>Moonlit</h3><span class="num">04</span></div>
+        <div class="tag">Soft glass / ethereal night — frosted glassmorphism, glowing orbs, slow motion.</div>
+        <div class="frame"><iframe src="4-moonlit.html" title="Moonlit" loading="lazy"></iframe></div>
+        <div class="actions"><a class="primary" href="4-moonlit.html" target="_blank" rel="noopener">Open fullscreen ↗</a></div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    Signs — a magic-trick astrology reading. Mockups for design approval.<br>
+    A webapp by Kenneth Aidan Foo · <a href="https://www.instagram.com/oddpaq" target="_blank" rel="noopener">@oddpaq</a>
+  </footer>
+</body>
+</html>

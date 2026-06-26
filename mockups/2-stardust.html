@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<title>Signs — Astrology Reading</title>
+<style>
+/* ============ STARDUST — Y2K Holographic Cyber-Mystic ============ */
+:root{
+  --ink:#05030f;
+  --ink2:#0c0826;
+  --chrome1:#aef6ff;  /* aqua */
+  --chrome2:#ff7be5;  /* magenta */
+  --chrome3:#e8f0ff;  /* silver */
+  --chrome4:#b39bff;  /* violet */
+  --gold:#ffe7a8;
+  --line:rgba(174,246,255,.28);
+  --safeT:env(safe-area-inset-top,0px);
+  --safeB:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;height:100%;width:100%;}
+body{
+  position:fixed; inset:0; overflow:hidden;
+  background:#02010a;
+  color:#eaf6ff;
+  font-family:"Segoe UI",system-ui,-apple-system,Arial,sans-serif;
+  touch-action:manipulation;
+  -webkit-user-select:none; user-select:none;
+  -webkit-font-smoothing:antialiased;
+}
+/* ---- full-bleed cosmic backdrop ---- */
+#cosmos{position:fixed;inset:0;z-index:0;overflow:hidden;
+  background:
+    radial-gradient(120% 80% at 18% 8%, rgba(123,107,255,.30), transparent 55%),
+    radial-gradient(120% 80% at 86% 92%, rgba(255,123,229,.24), transparent 55%),
+    radial-gradient(100% 70% at 90% 10%, rgba(110,246,255,.18), transparent 60%),
+    linear-gradient(160deg,#0a0726 0%,#05030f 48%,#0a0518 100%);
+}
+#stars{position:fixed;inset:0;z-index:0;display:block;}
+#cursor-cv{position:fixed;inset:0;z-index:60;pointer-events:none;}
+
+/* ---- centered phone column ---- */
+#stage{position:fixed;inset:0;z-index:2;display:flex;align-items:stretch;justify-content:flex-start;}
+#phone{position:relative;width:100%;max-width:390px;height:100%;
+  display:flex;flex-direction:column;
+  padding:calc(var(--safeT)) 0 calc(var(--safeB));
+  overflow:hidden;
+}
+#phone{border-right:1px solid rgba(174,246,255,.10);box-shadow:0 0 90px rgba(123,107,255,.18),0 0 140px rgba(255,123,229,.10);}
+
+/* ---- screen layering ---- */
+.screen{position:absolute;inset:0;display:none;flex-direction:column;
+  padding:calc(22px + var(--safeT)) 22px calc(22px + var(--safeB));
+  overflow:hidden;}
+.screen.active{display:flex;}
+.screen.enter{animation:scrnIn .62s cubic-bezier(.16,1,.3,1) both;}
+.screen.leave{animation:scrnOut .42s ease both;}
+@keyframes scrnIn{
+  0%{opacity:0;transform:scale(1.06) translateY(14px);filter:blur(8px) saturate(1.6);clip-path:inset(0 0 100% 0);}
+  55%{filter:blur(0) saturate(1);clip-path:inset(0 0 0 0);}
+  100%{opacity:1;transform:none;filter:none;}
+}
+@keyframes scrnOut{
+  0%{opacity:1;transform:none;}
+  100%{opacity:0;transform:scale(.96) translateY(-10px);filter:blur(6px);}
+}
+/* glitch wipe overlay */
+#wipe{position:fixed;inset:0;z-index:40;pointer-events:none;opacity:0;
+  background:repeating-linear-gradient(0deg,rgba(174,246,255,.16) 0 2px,transparent 2px 4px),
+    linear-gradient(110deg,rgba(255,123,229,.28),rgba(110,246,255,.28));
+  mix-blend-mode:screen;}
+#wipe.go{animation:wipe .5s ease both;}
+@keyframes wipe{0%{opacity:0;transform:translateX(-8%) skewX(-6deg);}
+  35%{opacity:.9;}60%{opacity:.7;transform:translateX(4%) skewX(4deg);}100%{opacity:0;transform:translateX(10%);}}
+
+/* ---- typography ---- */
+.kicker{font-size:11px;letter-spacing:.42em;text-transform:uppercase;
+  color:#bfe9ff;opacity:.8;font-family:"Courier New",monospace;margin:0 0 10px;}
+h1.holo,h2.holo{margin:0;font-weight:800;letter-spacing:.3px;line-height:1.08;
+  max-width:100%;overflow-wrap:break-word;
+  background:linear-gradient(92deg,#aef6ff 0%,#ffffff 28%,#ff7be5 54%,#b39bff 74%,#aef6ff 100%);
+  background-size:240% 100%;
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  -webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 1px 0 rgba(255,255,255,.18)) drop-shadow(0 0 16px rgba(123,107,255,.35));
+  animation:holoShift 6s linear infinite;}
+@keyframes holoShift{to{background-position:240% 0;}}
+h1.holo{font-size:clamp(26px,7.4vw,30px);}
+h2.holo{font-size:clamp(22px,6vw,25px);}
+.sub{color:#cfe6ff;opacity:.86;font-size:14.5px;line-height:1.5;margin:12px 0 0;font-weight:400;
+  max-width:100%;overflow-wrap:break-word;}
+.dot{font-family:"Courier New",monospace;letter-spacing:.18em;color:#aef6ff;text-transform:uppercase;font-size:12px;}
+
+/* ---- Frutiger-Aero glossy buttons ---- */
+.btn{position:relative;display:flex;align-items:center;justify-content:center;
+  border:1px solid rgba(255,255,255,.45);border-radius:18px;
+  background:linear-gradient(180deg,rgba(255,255,255,.30),rgba(174,246,255,.08) 46%,rgba(123,107,255,.20));
+  color:#fff;font-weight:700;font-size:18px;letter-spacing:.3px;
+  padding:18px 16px;cursor:pointer;overflow:hidden;
+  box-shadow:0 6px 22px rgba(15,8,45,.5),inset 0 1px 0 rgba(255,255,255,.6),inset 0 -10px 18px rgba(123,107,255,.18);
+  transition:transform .12s ease, box-shadow .2s ease;}
+.btn::before{content:"";position:absolute;left:6%;right:6%;top:5px;height:42%;border-radius:14px;
+  background:linear-gradient(180deg,rgba(255,255,255,.7),rgba(255,255,255,0));pointer-events:none;}
+.btn::after{content:"";position:absolute;top:0;bottom:0;width:36%;left:-40%;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent);
+  transform:skewX(-18deg);pointer-events:none;animation:sheen 3.6s ease-in-out infinite;}
+@keyframes sheen{0%,72%{left:-45%;}100%{left:130%;}}
+.btn:active{transform:scale(.97);box-shadow:0 3px 12px rgba(15,8,45,.55),inset 0 1px 0 rgba(255,255,255,.5);}
+.btn.sm{font-size:15px;padding:13px 12px;border-radius:14px;}
+
+/* iridescent card */
+.holocard{position:relative;border-radius:20px;padding:1.5px;
+  background:linear-gradient(135deg,#aef6ff,#ff7be5,#b39bff,#aef6ff);
+  background-size:200% 200%;animation:holoShift 7s linear infinite;}
+.holocard>.inner{border-radius:18px;background:linear-gradient(170deg,rgba(12,8,38,.86),rgba(5,3,15,.92));
+  padding:16px;height:100%;}
+
+/* response stamp + toast */
+.stamp{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  z-index:30;pointer-events:none;}
+.stamp .word{font-weight:900;font-size:clamp(40px,13vw,76px);letter-spacing:1px;
+  background:linear-gradient(92deg,#aef6ff,#ffffff,#ff7be5,#b39bff);
+  -webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;
+  text-shadow:0 0 30px rgba(123,107,255,.5);
+  transform:scale(.3) rotate(-7deg);opacity:0;}
+.stamp.show .word{animation:stampIn .7s cubic-bezier(.2,1.5,.4,1) both;}
+@keyframes stampIn{0%{transform:scale(.2) rotate(-12deg);opacity:0;}
+  45%{transform:scale(1.08) rotate(-4deg);opacity:1;}
+  75%{transform:scale(.98) rotate(-2deg);opacity:1;}
+  100%{transform:scale(1) rotate(-2deg);opacity:0;}}
+
+/* generic grids */
+.grid{display:grid;gap:11px;}
+.tile{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;
+  border:1px solid rgba(174,246,255,.30);border-radius:16px;padding:13px 6px;cursor:pointer;
+  background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(123,107,255,.10));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.35);
+  transition:transform .12s ease,box-shadow .2s ease,border-color .2s;}
+.tile:active{transform:scale(.95);}
+.tile .gly{font-size:26px;line-height:1;filter:drop-shadow(0 0 8px rgba(174,246,255,.5));}
+.tile .lbl{font-size:12px;color:#dcefff;opacity:.92;letter-spacing:.3px;}
+.tile.sel{border-color:#ff7be5;box-shadow:0 0 0 1px #ff7be5,0 0 18px rgba(255,123,229,.5),inset 0 1px 0 rgba(255,255,255,.4);}
+
+.flex1{flex:1 1 auto;min-height:0;}
+/* NB: no `display` here — `.screen` (display:none) / `.screen.active` (display:flex)
+   own visibility. A bare `display:flex` would out-rank `.screen{display:none}` (same
+   specificity, later in source) and make every centred screen permanently visible. */
+.center{justify-content:center;}
+.scrollable{overflow-y:auto;-webkit-overflow-scrolling:touch;}
+
+/* ---- WELCOME checker floor ---- */
+#welcome{padding:0;}
+.checkfloor{position:absolute;inset:0;z-index:0;overflow:hidden;}
+.checkfloor .tiles{position:absolute;left:50%;bottom:-6%;width:240%;height:78%;
+  transform:translateX(-50%) perspective(440px) rotateX(64deg);
+  transform-origin:bottom center;
+  background-image:
+    linear-gradient(rgba(174,246,255,.0),rgba(174,246,255,.0)),
+    repeating-linear-gradient(90deg,rgba(174,246,255,.45) 0 1px,transparent 1px 25%),
+    repeating-linear-gradient(0deg,rgba(255,123,229,.40) 0 1px,transparent 1px 9%);
+  box-shadow:inset 0 0 120px rgba(123,107,255,.5);}
+.checkfloor .glow{position:absolute;inset:0;
+  background:radial-gradient(120% 70% at 50% 108%,rgba(255,123,229,.35),transparent 60%);}
+.welcome-inner{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;
+  padding:calc(40px + var(--safeT)) 26px calc(26px + var(--safeB));}
+/* the King band */
+#kingBand{position:absolute;left:0;right:0;bottom:0;height:13.5%;z-index:3;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  border-top:1px solid rgba(174,246,255,.55);
+  background:linear-gradient(180deg,rgba(174,246,255,.10),rgba(230,236,255,.22) 50%,rgba(174,246,255,.10));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.6),inset 0 -1px 0 rgba(255,255,255,.3);}
+#kingBand .lbl{font-family:"Courier New",monospace;font-size:11px;letter-spacing:.42em;
+  text-transform:uppercase;color:#eaf6ff;opacity:.85;}
+#kingBand .chrome-strip{position:absolute;inset:0;
+  background:repeating-linear-gradient(90deg,transparent 0 1px,rgba(255,255,255,.10) 1px 2px,transparent 2px 16px);}
+/* invisible value zones overlay */
+#valueZones{position:absolute;left:0;right:0;top:0;height:86.5%;z-index:3;
+  display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(3,1fr);}
+#valueZones>div{cursor:pointer;}
+
+/* gender buttons quartered */
+.genderbtn{position:relative;height:88px;width:100%;}
+.genderbtn .q{position:absolute;top:0;bottom:0;width:25%;z-index:2;cursor:pointer;}
+.genderbtn .q:nth-child(1){left:0%;} .genderbtn .q:nth-child(2){left:25%;}
+.genderbtn .q:nth-child(3){left:50%;} .genderbtn .q:nth-child(4){left:75%;}
+
+/* captcha */
+.capgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;}
+.capcell{position:relative;aspect-ratio:1;border-radius:12px;overflow:hidden;cursor:pointer;
+  border:1px solid rgba(174,246,255,.25);background:#0a0a1a;}
+.capcell .chk{position:absolute;inset:0;background:rgba(110,246,255,.28);
+  display:flex;align-items:center;justify-content:center;font-size:34px;font-weight:900;color:#fff;
+  opacity:0;transition:opacity .15s;}
+.capcell.on .chk{opacity:1;}
+
+/* madlibs inputs */
+.mad{font-size:17px;line-height:2.4;color:#dcefff;}
+.mad input{background:rgba(174,246,255,.10);border:none;border-bottom:2px solid #ff7be5;
+  color:#fff;font-size:16px;font-family:inherit;padding:4px 8px;min-width:90px;max-width:140px;
+  border-radius:6px 6px 0 0;outline:none;text-align:center;}
+.mad input:focus{background:rgba(255,123,229,.16);}
+
+/* calculating */
+.bar{height:26px;border-radius:13px;border:1px solid rgba(174,246,255,.4);overflow:hidden;
+  background:rgba(8,6,26,.7);box-shadow:inset 0 2px 6px rgba(0,0,0,.6);position:relative;}
+.bar>i{display:block;height:100%;width:0%;border-radius:13px;
+  background:linear-gradient(90deg,#aef6ff,#ff7be5,#b39bff);background-size:200% 100%;
+  animation:holoShift 1.6s linear infinite;transition:width .4s ease;
+  box-shadow:0 0 16px rgba(255,123,229,.6);}
+.bar>i::after{content:"";position:absolute;inset:0;
+  background:repeating-linear-gradient(90deg,rgba(255,255,255,.22) 0 8px,transparent 8px 18px);}
+.statusline{font-family:"Courier New",monospace;font-size:13px;color:#bfe9ff;letter-spacing:.04em;
+  min-height:20px;}
+
+/* marquee */
+.marquee{overflow:hidden;white-space:nowrap;border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  padding:7px 0;margin-top:14px;}
+.marquee span{display:inline-block;padding-left:100%;font-family:"Courier New",monospace;
+  font-size:11px;letter-spacing:.34em;color:#aef6ff;opacity:.8;
+  animation:scrollx 16s linear infinite;}
+@keyframes scrollx{to{transform:translateX(-100%);}}
+
+/* reveal typewriter */
+#reveal{padding:calc(30px + var(--safeT)) 24px calc(22px + var(--safeB));}
+.reading{font-size:16.5px;line-height:1.62;color:#e9f4ff;font-weight:400;}
+.reading .glyph{font-size:1.25em;color:#aef6ff;}
+.caret{display:inline-block;width:9px;height:1.05em;margin-left:1px;vertical-align:-2px;
+  background:#aef6ff;animation:blink 1s steps(1) infinite;box-shadow:0 0 8px #aef6ff;}
+@keyframes blink{50%{opacity:0;}}
+
+/* hero card */
+.playing-card{width:210px;height:300px;border-radius:18px;position:relative;
+  background:linear-gradient(165deg,#ffffff,#f0f4ff);
+  box-shadow:0 24px 60px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.6);
+  color:#15102b;overflow:hidden;}
+.playing-card .corner{position:absolute;font-weight:900;line-height:.92;text-align:center;}
+.playing-card .corner .v{font-size:30px;}
+.playing-card .corner .s{font-size:26px;}
+.playing-card .tl{top:12px;left:13px;}
+.playing-card .br{bottom:12px;right:13px;transform:rotate(180deg);}
+.playing-card .pip{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:120px;}
+.playing-card .foil{position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(115deg,transparent 30%,rgba(174,246,255,.65),rgba(255,123,229,.6),rgba(179,155,255,.6),transparent 70%);
+  background-size:280% 280%;mix-blend-mode:screen;}
+.card-bloom .playing-card{animation:cardBloom 1s cubic-bezier(.2,1,.3,1) both;}
+.card-bloom .foil{animation:foilSweep 2.4s ease-in-out .5s infinite;}
+@keyframes cardBloom{0%{transform:rotateY(90deg) scale(.6);opacity:0;}
+  60%{transform:rotateY(-12deg) scale(1.04);opacity:1;}100%{transform:rotateY(0) scale(1);opacity:1;}}
+@keyframes foilSweep{0%{background-position:0% 0%;}100%{background-position:280% 280%;}}
+.red{color:#d61f4f;} .blk{color:#15102b;}
+
+/* nav / footer */
+.qhead{display:flex;align-items:center;gap:10px;margin-bottom:4px;}
+.qhead .ix{font-family:"Courier New",monospace;font-size:11px;color:#aef6ff;opacity:.7;letter-spacing:.2em;}
+.foot{position:relative;z-index:3;text-align:center;padding:10px 0 2px;}
+.foot .cred{font-size:11px;color:#9fb6d8;opacity:.55;letter-spacing:.04em;cursor:default;}
+.foot .ig{display:inline-block;margin-top:6px;font-size:11px;color:#aef6ff;opacity:.8;
+  text-decoration:none;letter-spacing:.18em;font-family:"Courier New",monospace;}
+
+/* cheat panel */
+#cheat{position:fixed;left:50%;bottom:14px;transform:translateX(-50%);z-index:80;display:none;
+  width:min(380px,92vw);background:rgba(6,4,20,.95);border:1px solid #ff7be5;border-radius:14px;
+  padding:12px 14px;font-family:"Courier New",monospace;font-size:12px;color:#cfe6ff;
+  box-shadow:0 0 30px rgba(255,123,229,.5);}
+#cheat.show{display:block;}
+#cheat b{color:#aef6ff;}
+#cheat .armed{font-size:18px;color:#fff;letter-spacing:.06em;}
+#cheat .maps{margin-top:8px;opacity:.78;line-height:1.5;font-size:10.5px;}
+
+::-webkit-scrollbar{width:0;height:0;}
+@media (prefers-reduced-motion: reduce){
+  .btn::after,.marquee span,.bar>i,.card-bloom .foil{animation:none!important;}
+  .screen.enter{animation:fadeR .3s both;}.screen.leave{animation:fadeRo .2s both;}
+  @keyframes fadeR{from{opacity:0;}to{opacity:1;}}@keyframes fadeRo{from{opacity:1;}to{opacity:0;}}
+  h1.holo,h2.holo,.holocard{animation:none;}
+}
+</style>
+</head>
+<body>
+<div id="cosmos"></div>
+<canvas id="stars"></canvas>
+
+<div id="stage">
+  <div id="phone">
+
+    <!-- 1. WELCOME -->
+    <section class="screen" id="welcome" data-i="0">
+      <div class="checkfloor"><div class="tiles"></div><div class="glow"></div></div>
+      <div id="valueZones"></div>
+      <div id="kingBand"><div class="chrome-strip"></div><div class="lbl">◆ tap to begin ◆</div></div>
+      <div class="welcome-inner">
+        <p class="kicker">✦ Signs ✦</p>
+        <h1 class="holo">Welcome to Signs<br>Astrology Reading</h1>
+        <p class="sub">The stars have been waiting for you. Take the quiz and let the cosmos read your soul — and the card you're holding in your mind.</p>
+        <div style="flex:1"></div>
+        <div class="btn" style="pointer-events:none;margin-bottom:8%;">✧ Tap anywhere to begin ✧</div>
+      </div>
+    </section>
+
+    <!-- 2. GENDER -->
+    <section class="screen center" id="gender" data-i="1">
+      <p class="kicker">Question 01</p>
+      <h2 class="holo">What's your gender?</h2>
+      <p class="sub">The energies flow differently through each of us.</p>
+      <div style="display:flex;flex-direction:column;gap:14px;margin-top:26px;">
+        <div class="btn genderbtn" data-g="Male"><span>Male</span>
+          <div class="q"></div><div class="q"></div><div class="q"></div><div class="q"></div></div>
+        <div class="btn genderbtn" data-g="Female"><span>Female</span>
+          <div class="q"></div><div class="q"></div><div class="q"></div><div class="q"></div></div>
+        <div class="btn genderbtn" data-g="Other"><span>Other</span>
+          <div class="q"></div><div class="q"></div><div class="q"></div><div class="q"></div></div>
+      </div>
+      <div class="marquee"><span>★ THE UNIVERSE IS LISTENING ★ YOUR FATE IS WRITTEN IN STARDUST ★ TRUST THE SIGNS ★ THE UNIVERSE IS LISTENING ★</span></div>
+    </section>
+
+    <!-- 3. STAR SIGN -->
+    <section class="screen" id="zodiac" data-i="2">
+      <p class="kicker">Question 02</p>
+      <h2 class="holo">What's your star sign?</h2>
+      <div class="flex1 scrollable" style="margin-top:18px;">
+        <div class="grid" id="zodiacGrid" style="grid-template-columns:repeat(3,1fr);"></div>
+      </div>
+    </section>
+
+    <!-- 4. CHINESE ZODIAC -->
+    <section class="screen" id="chinese" data-i="3">
+      <p class="kicker">Question 03</p>
+      <h2 class="holo">What's your Chinese zodiac?</h2>
+      <div class="flex1 scrollable" style="margin-top:18px;">
+        <div class="grid" id="chineseGrid" style="grid-template-columns:repeat(3,1fr);"></div>
+      </div>
+    </section>
+
+    <!-- 5. POWER RANGER -->
+    <section class="screen" id="ranger" data-i="4">
+      <p class="kicker">Question 04</p>
+      <h2 class="holo">If you were a Power Hero, which would you be?</h2>
+      <div class="flex1 center">
+        <div class="grid" id="rangerGrid" style="grid-template-columns:repeat(2,1fr);margin-top:10px;"></div>
+      </div>
+    </section>
+
+    <!-- 6. MAD LIBS -->
+    <section class="screen center" id="madlibs" data-i="5">
+      <p class="kicker">Question 05</p>
+      <h2 class="holo">Tell the stars a story.</h2>
+      <div class="mad" style="margin-top:26px;">
+        When I am at <input id="m1" placeholder="place" autocomplete="off">,
+        I like to <input id="m2" placeholder="verb" autocomplete="off">
+        with <input id="m3" placeholder="someone" autocomplete="off">.
+      </div>
+      <div class="btn sm" id="madGo" style="margin-top:34px;">Continue ➜</div>
+    </section>
+
+    <!-- 7. CAPTCHA -->
+    <section class="screen center" id="captcha" data-i="6">
+      <div class="holocard"><div class="inner">
+        <p class="dot" style="margin:0 0 4px;">▦ verify you are starborn ▦</p>
+        <div style="font-weight:700;font-size:18px;margin-bottom:12px;">Select all squares with traffic lights</div>
+        <div class="capgrid" id="capGrid"></div>
+      </div></div>
+      <div class="btn sm" id="capGo" style="margin-top:22px;">Verify</div>
+    </section>
+
+    <!-- 8. WORM -->
+    <section class="screen center" id="worm" data-i="7">
+      <p class="kicker">One more thing…</p>
+      <h2 class="holo">If I were a worm, would you still love me?</h2>
+      <p class="sub">Be honest. The cosmos already knows.</p>
+      <div style="display:flex;gap:14px;margin-top:30px;">
+        <div class="btn" style="flex:1" data-w="Yes">Yes 💖</div>
+        <div class="btn" style="flex:1" data-w="No">No</div>
+      </div>
+    </section>
+
+    <!-- 9. CALCULATING -->
+    <section class="screen center" id="calc" data-i="8">
+      <p class="kicker" style="text-align:center;">✦ please wait ✦</p>
+      <h2 class="holo" style="text-align:center;">Calculating your<br>astrology prediction</h2>
+      <div style="margin-top:34px;">
+        <div class="bar"><i id="calcBar"></i></div>
+        <p class="statusline" id="calcStatus" style="text-align:center;margin-top:16px;"></p>
+        <p class="dot" id="calcPct" style="text-align:center;margin-top:4px;opacity:.7;">0%</p>
+      </div>
+    </section>
+
+    <!-- 10. REVEAL -->
+    <section class="screen" id="reveal" data-i="9">
+      <p class="kicker">Your Reading</p>
+      <div class="flex1 scrollable" style="margin-top:8px;">
+        <div class="reading" id="readingBox"></div>
+        <div id="cardHero" style="display:none;justify-content:center;margin:26px 0 6px;"></div>
+        <div id="cardCaption" style="display:none;text-align:center;margin-top:6px;"></div>
+      </div>
+      <div class="btn sm" id="nextBtn" style="margin-top:14px;">Next ➜</div>
+    </section>
+
+  </div>
+</div>
+
+<div class="foot" id="footWrap" style="position:fixed;left:0;right:0;bottom:calc(6px + var(--safeB));z-index:5;">
+  <span class="cred" id="cred">A webapp by Kenneth Aidan Foo</span><br>
+  <a class="ig" href="https://www.instagram.com/oddpaq" target="_blank" rel="noopener">✦ Follow @oddpaq ✦</a>
+</div>
+
+<div id="wipe"></div>
+<div id="cheat"></div>
+<canvas id="cursor-cv"></canvas>
+
+<div class="stamp" id="stamp"><div class="word"></div></div>
+
+<script>
+"use strict";
+const RM = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ---------------- STATE ---------------- */
+const VALUES=["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
+const VALUE_NAMES=["Ace","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Jack","Queen","King"];
+const SUITS=["Clubs","Hearts","Spades","Diamonds"]; // CHaSeD
+const SUIT_SYM={Clubs:"♣",Hearts:"♥",Spades:"♠",Diamonds:"♦"};
+const SUIT_RED={Hearts:true,Diamonds:true};
+
+const state={ valueIdx:null, suit:null, gender:null, zodiac:null, zodiacGlyph:"♈", screen:0 };
+
+/* ---------------- STARFIELD ---------------- */
+const starCv=document.getElementById("stars"), sx=starCv.getContext("2d");
+let stars=[];
+function resizeStars(){
+  starCv.width=innerWidth; starCv.height=innerHeight;
+  stars=[];
+  const n=Math.min(140,Math.floor(innerWidth*innerHeight/9000));
+  for(let i=0;i<n;i++)stars.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,
+    r:Math.random()*1.5+.3,a:Math.random(),sp:Math.random()*.02+.004,
+    hue:Math.random()<.5?"#aef6ff":(Math.random()<.5?"#ff7be5":"#ffffff")});
+}
+resizeStars(); addEventListener("resize",()=>{resizeStars();});
+function drawStars(){
+  sx.clearRect(0,0,starCv.width,starCv.height);
+  for(const s of stars){
+    s.a+=s.sp; const tw=.4+.6*Math.abs(Math.sin(s.a));
+    sx.globalAlpha=tw; sx.fillStyle=s.hue;
+    sx.beginPath(); sx.arc(s.x,s.y,s.r,0,7); sx.fill();
+    if(s.r>1.1){ sx.globalAlpha=tw*.5; sx.fillRect(s.x-s.r*3,s.y-.3,s.r*6,.6); sx.fillRect(s.x-.3,s.y-s.r*3,.6,s.r*6); }
+  }
+  sx.globalAlpha=1;
+  if(!RM) requestAnimationFrame(drawStars);
+}
+drawStars();
+
+/* ---------------- SPARKLE CURSOR ---------------- */
+const cc=document.getElementById("cursor-cv"), cx=cc.getContext("2d");
+let sparks=[];
+function rs2(){cc.width=innerWidth;cc.height=innerHeight;}
+rs2(); addEventListener("resize",rs2);
+function emit(x,y,big){
+  const n=big?14:1;
+  for(let i=0;i<n;i++)sparks.push({x,y,vx:(Math.random()-.5)*(big?5:1.4),vy:(Math.random()-.5)*(big?5:1.4)-.4,
+    life:1,r:Math.random()*2+1,c:Math.random()<.5?"#aef6ff":"#ff7be5"});
+  if(sparks.length>240)sparks.splice(0,sparks.length-240);
+}
+addEventListener("pointermove",e=>{if(!RM)emit(e.clientX,e.clientY,false);},{passive:true});
+addEventListener("pointerdown",e=>{if(!RM)emit(e.clientX,e.clientY,true);},{passive:true});
+function drawSparks(){
+  cx.clearRect(0,0,cc.width,cc.height);
+  for(let i=sparks.length-1;i>=0;i--){const p=sparks[i];
+    p.x+=p.vx;p.y+=p.vy;p.vy+=.06;p.life-=.03;
+    if(p.life<=0){sparks.splice(i,1);continue;}
+    cx.globalAlpha=p.life; cx.fillStyle=p.c;
+    cx.beginPath();cx.arc(p.x,p.y,p.r*p.life,0,7);cx.fill();
+  }
+  cx.globalAlpha=1;
+  if(!RM) requestAnimationFrame(drawSparks);
+}
+if(!RM) drawSparks();
+
+/* ---------------- NAV / TRANSITIONS ---------------- */
+const screens=[...document.querySelectorAll(".screen")];
+function showScreen(i,instant){
+  const cur=screens[state.screen], nxt=screens[i];
+  if(cur===nxt && cur.classList.contains("active")){return;}
+  const wipe=document.getElementById("wipe");
+  if(!instant && !RM){wipe.classList.remove("go");void wipe.offsetWidth;wipe.classList.add("go");}
+  if(cur && cur!==nxt){
+    cur.classList.add("leave");
+    setTimeout(()=>{cur.classList.remove("active","leave","enter");},RM?160:420);
+  }
+  state.screen=i;
+  setTimeout(()=>{
+    nxt.classList.add("active");
+    nxt.classList.remove("leave");
+    void nxt.offsetWidth;
+    nxt.classList.add("enter");
+    setTimeout(()=>nxt.classList.remove("enter"),700);
+    if(i===8) runCalc();
+    if(i===9) startReveal();
+  }, (instant||RM)?0:180);
+}
+
+/* response stamp */
+function stamp(text,then){
+  const el=document.getElementById("stamp"), w=el.querySelector(".word");
+  w.textContent=text; el.classList.remove("show"); void el.offsetWidth; el.classList.add("show");
+  const dur=RM?260:700;
+  setTimeout(()=>{el.classList.remove("show"); if(then)then();},dur);
+}
+
+/* ---------------- 1. WELCOME — value capture ---------------- */
+(function buildWelcome(){
+  const vz=document.getElementById("valueZones");
+  for(let i=0;i<12;i++){
+    const d=document.createElement("div");
+    d.addEventListener("click",ev=>{ev.stopPropagation();captureValue(i);});
+    vz.appendChild(d);
+  }
+  document.getElementById("kingBand").addEventListener("click",ev=>{ev.stopPropagation();captureValue(12);});
+})();
+function captureValue(idx){
+  state.valueIdx=idx; refreshCheat();
+  go(()=>showScreen(1));
+}
+/* helper: small lockout so double-fire doesn't skip screens */
+let busy=false;
+function go(fn){ if(busy)return; busy=true; fn(); setTimeout(()=>busy=false,650); }
+
+/* ---------------- 2. GENDER — suit capture ---------------- */
+document.querySelectorAll(".genderbtn").forEach(btn=>{
+  const qs=btn.querySelectorAll(".q");
+  qs.forEach((q,qi)=>{
+    q.addEventListener("click",ev=>{
+      ev.stopPropagation();
+      state.gender=btn.dataset.g; state.suit=SUITS[qi]; refreshCheat();
+      go(()=>stamp("OK!",()=>showScreen(2)));
+    });
+  });
+});
+
+/* ---------------- 3. STAR SIGN ---------------- */
+const ZODIAC=[["Aries","♈"],["Taurus","♉"],["Gemini","♊"],["Cancer","♋"],["Leo","♌"],["Virgo","♍"],
+  ["Libra","♎"],["Scorpio","♏"],["Sagittarius","♐"],["Capricorn","♑"],["Aquarius","♒"],["Pisces","♓"]];
+(function(){const g=document.getElementById("zodiacGrid");
+  ZODIAC.forEach(([name,gly])=>{
+    const t=document.createElement("div");t.className="tile";
+    t.innerHTML=`<span class="gly">${gly}</span><span class="lbl">${name}</span>`;
+    t.addEventListener("click",()=>{
+      state.zodiac=name; state.zodiacGlyph=gly;
+      g.querySelectorAll(".tile").forEach(x=>x.classList.remove("sel"));t.classList.add("sel");
+      go(()=>stamp("Great!",()=>showScreen(3)));
+    });
+    g.appendChild(t);
+  });
+})();
+
+/* ---------------- 4. CHINESE ZODIAC ---------------- */
+const CHINESE=[["Rat","🐀"],["Ox","🐂"],["Tiger","🐅"],["Rabbit","🐇"],["Dragon","🐉"],["Snake","🐍"],
+  ["Horse","🐎"],["Goat","🐐"],["Monkey","🐒"],["Rooster","🐓"],["Dog","🐕"],["Pig","🐖"]];
+(function(){const g=document.getElementById("chineseGrid");
+  CHINESE.forEach(([name,gly])=>{
+    const t=document.createElement("div");t.className="tile";
+    t.innerHTML=`<span class="gly">${gly}</span><span class="lbl">${name}</span>`;
+    t.addEventListener("click",()=>{
+      g.querySelectorAll(".tile").forEach(x=>x.classList.remove("sel"));t.classList.add("sel");
+      go(()=>stamp("很好!",()=>showScreen(4)));
+    });
+    g.appendChild(t);
+  });
+})();
+
+/* ---------------- 5. POWER HERO ---------------- */
+const RANGERS=[["Red","#ff4d5e"],["Blue","#3aa0ff"],["Black","#3a3a52"],["Yellow","#ffd23a"],["Pink","#ff7be5"],["Green","#46e0a0"]];
+(function(){const g=document.getElementById("rangerGrid");
+  RANGERS.forEach(([name,col])=>{
+    const t=document.createElement("div");t.className="tile";
+    t.style.borderColor=col;
+    t.innerHTML=`<span class="gly" style="color:${col};text-shadow:0 0 12px ${col}">◆</span><span class="lbl">${name}</span>`;
+    t.addEventListener("click",()=>{
+      g.querySelectorAll(".tile").forEach(x=>x.classList.remove("sel"));t.classList.add("sel");
+      go(()=>stamp("Strong Choice!",()=>showScreen(5)));
+    });
+    g.appendChild(t);
+  });
+})();
+
+/* ---------------- 6. MAD LIBS ---------------- */
+document.getElementById("madGo").addEventListener("click",()=>{
+  // dismiss the mobile keyboard before the stamp/transition
+  ["m1","m2","m3"].forEach(id=>{const el=document.getElementById(id); if(el) el.blur();});
+  go(()=>stamp("Insightful!",()=>showScreen(6)));
+});
+
+/* ---------------- 7. CAPTCHA ---------------- */
+(function(){const g=document.getElementById("capGrid");
+  const lights=[0,4,5,7]; // which cells get a traffic light
+  for(let i=0;i<9;i++){
+    const c=document.createElement("div");c.className="capcell";
+    const hasLight=lights.includes(i);
+    c.innerHTML=tileArt(i,hasLight)+`<div class="chk">✓</div>`;
+    c.addEventListener("click",()=>c.classList.toggle("on"));
+    g.appendChild(c);
+  }
+})();
+function tileArt(i,light){
+  const skies=["#1a2b55","#27407a","#3a2b6a","#142a4a","#402a55","#1e3a5a","#2a2055","#0f2a44","#33255a"];
+  const bg=skies[i%skies.length];
+  let extra="";
+  if(light){
+    extra=`<rect x="44" y="18" width="12" height="34" rx="4" fill="#15151f"/>
+      <circle cx="50" cy="26" r="3.4" fill="#ff5050"/><circle cx="50" cy="35" r="3.4" fill="#ffd23a"/>
+      <circle cx="50" cy="44" r="3.4" fill="#46e0a0"/>`;
+  }
+  return `<svg viewBox="0 0 100 100" style="position:absolute;inset:0;width:100%;height:100%">
+    <rect width="100" height="100" fill="${bg}"/>
+    <rect y="62" width="100" height="38" fill="#2b2b3a"/>
+    <rect y="62" width="100" height="3" fill="#555"/>
+    <rect x="20" y="40" width="60" height="22" fill="${light?'#3a3a4a':'#444a66'}"/>
+    <rect x="6" y="44" width="14" height="18" fill="#3a4060"/>
+    <line x1="0" y1="80" x2="100" y2="80" stroke="#ffd23a" stroke-width="2" stroke-dasharray="8 6"/>
+    ${extra}
+  </svg>`;
+}
+document.getElementById("capGo").addEventListener("click",()=>{
+  go(()=>stamp("Are you sure…?",()=>showScreen(7)));
+});
+
+/* ---------------- 8. WORM ---------------- */
+document.querySelectorAll("[data-w]").forEach(b=>{
+  b.addEventListener("click",()=>go(()=>stamp("okay…",()=>showScreen(8))));
+});
+
+/* ---------------- 9. CALCULATING ---------------- */
+const CALC_LINES=["Aligning your stars...","Consulting the aether...","Cross-referencing your sign...",
+  "Decoding lunar resonance...","Shuffling the deck of fate...","Polishing the holographic mirror...",
+  "Finalising your reading..."];
+function runCalc(){
+  const bar=document.getElementById("calcBar"), st=document.getElementById("calcStatus"), pc=document.getElementById("calcPct");
+  let p=0, li=0;
+  st.textContent=CALC_LINES[0]; bar.style.width="0%"; pc.textContent="0%";
+  const total=RM?1600:5200;
+  const t0=performance.now();
+  function tick(now){
+    const k=Math.min(1,(now-t0)/total);
+    p=Math.floor(k*100); bar.style.width=p+"%"; pc.textContent=p+"%";
+    const idx=Math.min(CALC_LINES.length-1,Math.floor(k*CALC_LINES.length));
+    if(idx!==li){li=idx;st.textContent=CALC_LINES[idx];}
+    if(k<1 && state.screen===8) requestAnimationFrame(tick);
+    else if(state.screen===8){ setTimeout(()=>showScreen(9),420); }
+  }
+  requestAnimationFrame(tick);
+}
+
+/* ---------------- 10. REVEAL ---------------- */
+const COPY={
+  internal:{
+    A:"You are a person prone to bouts of real self-examination. This is in sharp contrast to a striking ability you have developed to appear socially very engaged, even the life and soul of the party; but in a way that only convinces others.",
+    B:"You will often be at a gathering and find yourself playing a part. While on the one hand you'll be talkative and funny, you'll be detaching yourself to the point where you will find yourself watching everything going on around you and feeling utterly unable to engage.",
+    C:"You play conversations back to yourself in your head and wonder what that person really meant when they said such-and-such."
+  },
+  conflict:{
+    A:"You learned to deal with conflict by exercising control. You like to show a calm, self-assured, fluid kind of stability (but because this is self-consciously created, it will create bouts of frustrated silliness and a delight in extremes, or at least a delight in being seen to be extreme). You most easily recognise this control in how you are with the people around you.",
+    B:"You have learned to protect yourself by keeping people at bay. Because in the past you have learned to be disappointed by people, you instinctively keep people at arm's length, until you decide they are to be allowed over that line into your group of close friends. However, once across that line, the problem is that an emotional dependency kicks in which leaves you feeling very hurt or rejected if it appears they have betrayed that status.",
+    C:"Because you are prone to self-examination, you will be aware of these traits. However, you are unusually able to examine even that self-examination, which means that you have become concerned about what the real you is."
+  },
+  hobbies:{
+    A:"You are creative, and have tried different avenues to utilise that ability. It may not be that you specifically, say, paint; it may be that your creativity shows itself in more subtle ways, but you will certainly find yourself having vivid and well-formed ideas which others find hard to grasp.",
+    B:"You set high standards for yourself, and in many ways are a bit of a perfectionist. The problem is that it means you often don't get stuff done, because you are frustrated by the idea of mediocrity and wearied by the idea of starting something afresh. However, once your brain is engaged you'll find yourself sailing. Very likely this will have led you to consider writing a novel or some such, but a fear that you won't quite achieve what you want stops you getting on with it.",
+    C:"There are ways in which you have been made to feel isolated from certain groups in the past — something of an outsider. Now what is happening is that you are taking that outsider role and defending it to the point of consciously avoiding being part of a group. This will serve you enormously well in your creative and career pursuits. You have an enormous cynicism towards those who prefer to be part of a group, and you always feel a pang of disappointment when your 'close' friends seem to follow that route."
+  },
+  assertions:{
+    A:"You have links at the moment with America, which are quite interesting and will look to yield worthwhile results. You're naturally a little disorganised. A look around your living space would show a box of photos unorganised into albums, out-of-date medicines, broken items not thrown out, and notes to yourself which are significantly out of date.",
+    B:"You tend to lack motivation. Because you're resourceful and talented enough to be pretty successful when you put your mind to things, this encourages you to procrastinate and put them off. Equally, you've given up dreams a little easily when your mind flitted elsewhere. There are in your home signs of an excursion into playing a musical instrument which you have since abandoned, or are finding yourself less interested in. (This may alternatively relate to poetry or creative writing you've briefly tried your hand at and left behind.)"
+  },
+  conclusion:"It's very interesting doing your reading. You are certainly bright, and open to life's possibilities — something not normally found among achieving people. You would do well to be less self-absorbed, as it tends to distance you a little. You could let people in a little more — I am aware there is a side you feel you should hide — but you really have an appealing personality, and also..."
+};
+function pick(o){const k=Object.keys(o);return o[k[Math.floor(Math.random()*k.length)]];}
+
+const ORD=["zeroth","first","second","third","fourth","fifth","sixth","seventh","eighth","ninth","tenth",
+"eleventh","twelfth","thirteenth","fourteenth","fifteenth","sixteenth","seventeenth","eighteenth","nineteenth",
+"twentieth","twenty-first","twenty-second","twenty-third","twenty-fourth","twenty-fifth","twenty-sixth",
+"twenty-seventh","twenty-eighth","twenty-ninth","thirtieth","thirty-first"];
+const MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
+function todayPhrase(){const d=new Date();return `the ${ORD[d.getDate()]} day of ${MONTHS[d.getMonth()]}`;}
+
+let revealSections=[], revealIdx=0, typing=false;
+function buildSections(){
+  const gly=`<span class="glyph">${state.zodiacGlyph}</span>`;
+  return [
+    {html:`Hello ${gly}. Welcome to your astrology reading on ${todayPhrase()}. Here is your reading...`},
+    {html:pick(COPY.internal)},
+    {html:pick(COPY.conflict)},
+    {html:pick(COPY.hobbies)},
+    {html:pick(COPY.assertions)},
+    {html:COPY.conclusion},
+    {card:true}
+  ];
+}
+function startReveal(){
+  if(state.valueIdx==null) state.valueIdx=Math.floor(Math.random()*13);
+  if(!state.suit) state.suit=SUITS[Math.floor(Math.random()*4)];
+  refreshCheat();
+  revealSections=buildSections(); revealIdx=0;
+  document.getElementById("readingBox").innerHTML="";
+  document.getElementById("cardHero").style.display="none";
+  document.getElementById("cardCaption").style.display="none";
+  const nb=document.getElementById("nextBtn"); nb.style.display="flex"; nb.textContent="Begin reading ➜";
+  nb.onclick=advanceReveal;
+}
+function advanceReveal(){
+  if(typing) return;
+  if(revealIdx>=revealSections.length){return;}
+  const sec=revealSections[revealIdx];
+  const box=document.getElementById("readingBox");
+  const nb=document.getElementById("nextBtn");
+  if(sec.card){
+    nb.style.display="none";
+    showCard();
+    revealIdx++;
+    return;
+  }
+  // new paragraph block
+  const p=document.createElement("p");
+  p.style.marginTop=revealIdx?"18px":"4px";
+  box.appendChild(p);
+  nb.style.display="none";
+  typeHTML(p, sec.html, ()=>{
+    revealIdx++;
+    nb.style.display="flex";
+    nb.textContent = (revealIdx>=revealSections.length-1)?"Reveal ✦":"Next ➜";
+    // autoscroll
+    box.parentElement.scrollTop=box.parentElement.scrollHeight;
+  });
+}
+/* typewriter that respects HTML tags */
+function typeHTML(el, html, done){
+  typing=true;
+  // tokenize into either a tag or a single char
+  const tokens=[]; let i=0;
+  while(i<html.length){
+    if(html[i]==="<"){const j=html.indexOf(">",i);tokens.push(html.slice(i,j+1));i=j+1;}
+    else{tokens.push(html[i]);i++;}
+  }
+  let k=0, acc="";
+  const caret='<span class="caret"></span>';
+  const speed=RM?0:16;
+  function step(){
+    if(state.screen!==9){typing=false;return;}
+    if(k>=tokens.length){el.innerHTML=acc;typing=false;done&&done();return;}
+    acc+=tokens[k++];
+    el.innerHTML=acc+caret;
+    el.parentElement.parentElement.scrollTop=el.parentElement.parentElement.scrollHeight;
+    if(RM){ while(k<tokens.length){acc+=tokens[k++];} el.innerHTML=acc; typing=false; done&&done(); return;}
+    setTimeout(step, tokens[k-1].length>1?0:speed);
+  }
+  step();
+}
+function showCard(){
+  const v=VALUES[state.valueIdx], vn=VALUE_NAMES[state.valueIdx];
+  const suit=state.suit, sym=SUIT_SYM[suit], cls=SUIT_RED[suit]?"red":"blk";
+  const hero=document.getElementById("cardHero");
+  hero.innerHTML=`<div class="playing-card ${cls}">
+      <div class="corner tl"><div class="v">${v}</div><div class="s">${sym}</div></div>
+      <div class="pip">${sym}</div>
+      <div class="corner br"><div class="v">${v}</div><div class="s">${sym}</div></div>
+      <div class="foil"></div>
+    </div>`;
+  hero.style.display="flex";
+  hero.classList.add("card-bloom");
+  const cap=document.getElementById("cardCaption");
+  cap.innerHTML=`<h2 class="holo" style="font-size:24px;">You picked the<br>${vn} of ${suit}.</h2>
+    <p class="sub" style="text-align:center;">…and that, dear ${state.zodiacGlyph}, is no coincidence. ✦</p>`;
+  cap.style.display="block";
+  document.getElementById("cardHero").parentElement.scrollTop=99999;
+}
+
+/* ---------------- CHEAT SHEET (triple-tap credit) ---------------- */
+const cheat=document.getElementById("cheat");
+function refreshCheat(){
+  const v=state.valueIdx!=null?VALUES[state.valueIdx]:"—";
+  const s=state.suit?SUIT_SYM[state.suit]+" "+state.suit:"—";
+  cheat.innerHTML=`<div>ARMED CARD</div>
+    <div class="armed">${v} ${state.suit?SUIT_SYM[state.suit]:""} &nbsp;<span style="opacity:.6;font-size:12px">(${v==="—"?"unset":VALUE_NAMES[state.valueIdx]} of ${state.suit||"?"})</span></div>
+    <div class="maps">
+      <b>VALUE map</b> (welcome): 4×3 grid A 2 3 4 / 5 6 7 8 / 9 10 J Q, bottom band = K.<br>
+      <b>SUIT map</b> (gender ¼ L→R): ♣ Clubs · ♥ Hearts · ♠ Spades · ♦ Diamonds.<br>
+      value=${v} &nbsp; suit=${s}
+    </div>`;
+}
+refreshCheat();
+let taps=0,tapT;
+function credTap(){
+  taps++; clearTimeout(tapT);
+  tapT=setTimeout(()=>taps=0,800);
+  if(taps>=3){taps=0;cheat.classList.toggle("show");refreshCheat();}
+}
+const credEl=document.getElementById("cred");
+credEl.addEventListener("click",credTap);
+// tap the cheat panel itself to dismiss (it can overlap the credit, blocking a re-tap)
+cheat.addEventListener("click",()=>{cheat.classList.remove("show");});
+
+/* prevent native zoom/scroll fighting */
+document.addEventListener("gesturestart",e=>e.preventDefault());
+
+/* ---------------- BOOT ---------------- */
+screens.forEach(s=>s.classList.remove("active"));
+state.screen=0;
+screens[0].classList.add("active","enter");
+setTimeout(()=>screens[0].classList.remove("enter"),700);
+</script>
+</body>
+</html>

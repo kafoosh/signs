@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#f3ead7">
+<title>Signs — An Astrology Reading</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,900;1,9..144,400;1,9..144,500&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   CELESTIAL PRESS — Editorial Risograph Zine / Tarot
+   Two inks on paper: deep ink navy + riso red-orange + cream.
+   ============================================================ */
+:root{
+  --paper:#f3ead7;
+  --paper-deep:#ece0c6;
+  --ink:#1b2233;          /* deep navy near-black */
+  --ink-soft:#39415a;
+  --spot:#e8492b;         /* riso red-orange */
+  --spot-deep:#c93a20;
+  --spot-ghost:rgba(232,73,43,0.14);
+  --line:rgba(27,34,51,0.18);
+  --line-strong:rgba(27,34,51,0.42);
+  --serif:'Fraunces', Georgia, 'Times New Roman', serif;
+  --mono:'Space Mono', ui-monospace, 'Courier New', monospace;
+  --ease:cubic-bezier(.7,.01,.16,1);
+  --ease-out:cubic-bezier(.16,.84,.27,1);
+  --col:430px;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;}
+body{
+  position:fixed;inset:0;overflow:hidden;
+  background:var(--ink);
+  color:var(--ink);
+  font-family:var(--serif);
+  touch-action:manipulation;
+  -webkit-user-select:none;user-select:none;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+button{font-family:inherit;color:inherit;cursor:pointer;border:none;background:none;}
+input{font-family:inherit;}
+
+/* ---- App frame: centered phone column on wide screens ---- */
+#app{
+  position:fixed;inset:0;
+  display:flex;align-items:stretch;justify-content:center;
+  background:
+    radial-gradient(120% 80% at 50% -10%, #2a3247 0%, var(--ink) 60%);
+}
+#stage{
+  position:relative;
+  width:100%;max-width:var(--col);
+  background:var(--paper);
+  overflow:hidden;
+  box-shadow:0 0 0 1px rgba(0,0,0,.4), 0 30px 90px -20px rgba(0,0,0,.7);
+}
+/* paper grain + halftone overlay */
+#stage::before{
+  content:"";position:absolute;inset:0;z-index:60;pointer-events:none;
+  background-image:
+    radial-gradient(rgba(27,34,51,0.05) 1px, transparent 1.4px);
+  background-size:4px 4px;
+  mix-blend-mode:multiply;opacity:.55;
+}
+#stage::after{
+  content:"";position:absolute;inset:0;z-index:61;pointer-events:none;
+  opacity:.06;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+}
+
+/* ---- Screen scaffolding ---- */
+.screen{
+  position:absolute;inset:0;z-index:10;
+  display:flex;flex-direction:column;
+  padding:calc(env(safe-area-inset-top) + 26px) 30px calc(env(safe-area-inset-bottom) + 26px);
+  opacity:0;visibility:hidden;
+  transform:translateY(0);
+}
+.screen.active{opacity:1;visibility:visible;z-index:20;}
+/* enter/leave transitions */
+.screen.enter-right{animation:slideInRight .62s var(--ease) both;}
+.screen.enter-fade{animation:fadeUp .6s var(--ease-out) both;}
+.screen.leaving{animation:wipeOut .5s var(--ease) both;z-index:15;}
+@keyframes slideInRight{from{opacity:0;transform:translateX(38px);}to{opacity:1;transform:translateX(0);}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(22px);}to{opacity:1;transform:translateY(0);}}
+@keyframes wipeOut{from{opacity:1;transform:translateX(0);}to{opacity:0;transform:translateX(-30px);}}
+
+/* ---- Editorial chrome bits ---- */
+.eyebrow{
+  font-family:var(--mono);font-size:11px;font-weight:700;
+  letter-spacing:.28em;text-transform:uppercase;
+  color:var(--spot);
+  display:flex;align-items:center;gap:10px;
+}
+.eyebrow .num{color:var(--ink);}
+.rule{height:1.5px;background:var(--ink);opacity:.85;flex:1;}
+.rule-thin{height:1px;background:var(--line-strong);width:100%;}
+.kicker{
+  font-family:var(--mono);font-size:10.5px;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--ink-soft);
+}
+.display{
+  font-family:var(--serif);font-weight:600;
+  line-height:0.98;letter-spacing:-.015em;
+  font-optical-sizing:auto;
+  overflow-wrap:break-word;hyphens:auto;max-width:100%;
+}
+h1.display{font-size:clamp(30px,8.4vw,50px);}
+h2.display{font-size:clamp(29px,7.6vw,39px);font-weight:600;}
+.serif-it{font-style:italic;font-weight:400;}
+.spot-ink{color:var(--spot);}
+
+.screen-head{margin-bottom:18px;flex:0 0 auto;}
+.screen-head .eyebrow{margin-bottom:18px;}
+.screen-body{flex:1 1 auto;display:flex;flex-direction:column;min-height:0;}
+
+/* staggered children */
+.stagger>*{opacity:0;animation:fadeUp .6s var(--ease-out) both;}
+.screen.active .stagger>*:nth-child(1){animation-delay:.06s;}
+.screen.active .stagger>*:nth-child(2){animation-delay:.14s;}
+.screen.active .stagger>*:nth-child(3){animation-delay:.22s;}
+.screen.active .stagger>*:nth-child(4){animation-delay:.30s;}
+.screen.active .stagger>*:nth-child(5){animation-delay:.38s;}
+.screen.active .stagger>*:nth-child(6){animation-delay:.46s;}
+
+/* ============================================================
+   1 — WELCOME (value capture, checkerboard)
+   ============================================================ */
+#s-welcome{padding:0;cursor:pointer;}
+.welcome-bg{position:absolute;inset:0;z-index:1;}
+/* tarot-back ledger tile in spot colour */
+.welcome-bg .tiles{
+  position:absolute;left:0;right:0;top:0;bottom:78px;
+  background-image:
+    linear-gradient(var(--spot-ghost) 1px,transparent 1px),
+    linear-gradient(90deg,var(--spot-ghost) 1px,transparent 1px),
+    repeating-linear-gradient(45deg, rgba(232,73,43,0.05) 0 8px, transparent 8px 16px);
+  background-size:
+    calc(100%/4) calc(100%/3),
+    calc(100%/4) calc(100%/3),
+    auto;
+}
+/* subtle column/row hint lines so performer sees the 4x3 */
+.welcome-bg .gridhint{
+  position:absolute;left:0;right:0;top:0;bottom:78px;
+  background-image:
+    linear-gradient(90deg,transparent calc(25% - 0.5px),rgba(27,34,51,.10) calc(25%),transparent calc(25% + 0.5px)),
+    linear-gradient(90deg,transparent calc(50% - 0.5px),rgba(27,34,51,.10) calc(50%),transparent calc(50% + 0.5px)),
+    linear-gradient(90deg,transparent calc(75% - 0.5px),rgba(27,34,51,.10) calc(75%),transparent calc(75% + 0.5px)),
+    linear-gradient(transparent calc(33.33% - 0.5px),rgba(27,34,51,.10) calc(33.33%),transparent calc(33.33% + 0.5px)),
+    linear-gradient(transparent calc(66.66% - 0.5px),rgba(27,34,51,.10) calc(66.66%),transparent calc(66.66% + 0.5px));
+}
+.welcome-bg .kingband{
+  position:absolute;left:0;right:0;bottom:0;height:78px;
+  background:var(--spot-ghost);
+  border-top:1.5px solid var(--line-strong);
+  display:flex;align-items:center;justify-content:center;
+}
+.welcome-bg .kingband span{
+  font-family:var(--mono);font-size:10px;letter-spacing:.3em;
+  text-transform:uppercase;color:var(--spot-deep);opacity:.8;
+}
+/* decorative riso star motif */
+.welcome-stars{position:absolute;inset:0;z-index:2;pointer-events:none;opacity:.85;}
+.welcome-content{
+  position:relative;z-index:3;height:100%;
+  display:flex;flex-direction:column;
+  padding:calc(env(safe-area-inset-top) + 40px) 28px calc(env(safe-area-inset-bottom) + 100px);
+  pointer-events:none;
+}
+.welcome-content .eyebrow{margin-bottom:auto;}
+.misreg{position:relative;}
+.misreg::before{
+  content:attr(data-text);position:absolute;left:-2px;top:1.5px;
+  color:var(--spot);opacity:.85;z-index:-1;
+}
+.welcome-content h1{margin-bottom:14px;}
+.welcome-lede{
+  font-size:16px;line-height:1.45;max-width:21em;width:100%;color:var(--ink-soft);
+  font-weight:400;margin-bottom:26px;
+  overflow-wrap:break-word;hyphens:auto;
+}
+.begin-chip{
+  align-self:flex-start;
+  font-family:var(--mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--paper);background:var(--ink);
+  padding:13px 22px;display:inline-flex;align-items:center;gap:10px;
+  border:1.5px solid var(--ink);
+  animation:breathe 2.6s ease-in-out infinite;
+}
+.begin-chip .arrow{display:inline-block;animation:nudge 1.6s ease-in-out infinite;}
+@keyframes breathe{0%,100%{transform:translateY(0);}50%{transform:translateY(-3px);}}
+@keyframes nudge{0%,100%{transform:translateX(0);}50%{transform:translateX(5px);}}
+
+/* tap ripple feedback (ink bleed) */
+.inkblot{
+  position:absolute;z-index:4;width:10px;height:10px;border-radius:50%;
+  background:var(--spot);pointer-events:none;transform:translate(-50%,-50%) scale(0);
+  mix-blend-mode:multiply;
+  animation:bleed .55s var(--ease-out) forwards;
+}
+@keyframes bleed{to{transform:translate(-50%,-50%) scale(46);opacity:0;}}
+
+/* ============================================================
+   Choice buttons (stamp style)
+   ============================================================ */
+.choice-stack{display:flex;flex-direction:column;gap:13px;margin-top:8px;}
+.btn-line{
+  position:relative;width:100%;text-align:left;
+  padding:18px 20px;
+  border:1.5px solid var(--ink);
+  background:var(--paper);
+  font-size:21px;font-weight:500;letter-spacing:-.01em;
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  transition:transform .18s var(--ease-out), background .18s, color .18s;
+  overflow:hidden;
+}
+.btn-line .tag{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--ink-soft);text-transform:uppercase;}
+.btn-line::after{
+  content:"";position:absolute;inset:0;background:var(--ink);
+  transform:translateX(-101%);transition:transform .3s var(--ease);z-index:-1;
+}
+.btn-line:active{transform:translate(2px,2px);}
+.btn-line.picked{color:var(--paper);}
+.btn-line.picked::after{transform:translateX(0);}
+.btn-line.picked .tag{color:rgba(243,234,215,.7);}
+
+/* grid of small choices */
+.choice-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
+  align-content:start;overflow-y:auto;padding:2px;-webkit-overflow-scrolling:touch;
+}
+.choice-grid.cols2{grid-template-columns:repeat(2,1fr);}
+.cell{
+  position:relative;
+  border:1.5px solid var(--ink);background:var(--paper);
+  aspect-ratio:1/1.05;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  padding:8px 4px;
+  transition:transform .16s var(--ease-out), background .16s, color .16s;
+}
+.cell .glyph{font-size:30px;line-height:1;color:var(--ink);transition:color .16s, transform .3s var(--ease-out);}
+.cell .glyph .animal{width:42px;height:30px;display:block;color:inherit;}
+.cell.picked .glyph .animal{color:var(--spot);}
+.cell .nm{font-size:12.5px;font-weight:500;letter-spacing:-.01em;text-align:center;line-height:1.1;}
+.cell .swatch{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--ink);}
+.cell:active{transform:scale(.95);}
+.cell.picked{background:var(--ink);color:var(--paper);}
+.cell.picked .glyph{color:var(--spot);transform:scale(1.16) rotate(-6deg);}
+.cell.picked .nm{color:var(--paper);}
+
+/* response stamp overlay */
+.stamp-wrap{
+  position:absolute;inset:0;z-index:40;display:flex;align-items:center;justify-content:center;
+  pointer-events:none;opacity:0;
+}
+.stamp-wrap.show{animation:stampFlash 1.05s ease forwards;}
+.stamp{
+  font-family:var(--serif);font-style:italic;font-weight:500;
+  font-size:clamp(46px,16vw,76px);color:var(--spot);
+  border:3px solid var(--spot);padding:14px 34px;
+  transform:rotate(-7deg) scale(.4);opacity:0;
+  background:rgba(243,234,215,.78);
+  box-shadow:0 0 0 2px var(--paper) inset;
+  position:relative;
+}
+.stamp::after{ /* misregistration ghost */
+  content:attr(data-t);position:absolute;left:2px;top:-2px;
+  color:var(--ink);opacity:.18;z-index:-1;
+}
+.stamp-wrap.show .stamp{animation:stampIn 1.05s var(--ease) forwards;}
+@keyframes stampFlash{0%{opacity:1;}80%{opacity:1;}100%{opacity:0;}}
+@keyframes stampIn{
+  0%{transform:rotate(-22deg) scale(1.5);opacity:0;}
+  18%{transform:rotate(-7deg) scale(.92);opacity:1;}
+  26%{transform:rotate(-7deg) scale(1.02);}
+  100%{transform:rotate(-7deg) scale(1);opacity:1;}
+}
+
+/* ============================================================
+   Gender (suit capture) — quartered buttons
+   ============================================================ */
+.gender-btn{position:relative;overflow:hidden;}
+.gender-btn .quarters{position:absolute;inset:0;display:flex;z-index:2;}
+.gender-btn .quarters span{flex:1;}
+
+/* ============================================================
+   Mad-libs
+   ============================================================ */
+.madlib{font-size:23px;line-height:1.75;font-weight:400;overflow-wrap:break-word;}
+.madlib .blank{
+  display:inline-block;position:relative;
+}
+.madlib input{
+  font-family:var(--serif);font-style:italic;font-weight:500;
+  font-size:21px;color:var(--spot-deep);
+  background:transparent;border:none;
+  border-bottom:2px solid var(--spot);
+  width:5em;max-width:42vw;text-align:center;padding:0 4px 2px;outline:none;
+}
+.madlib input::placeholder{color:rgba(27,34,51,.3);font-style:italic;}
+
+/* ============================================================
+   Captcha
+   ============================================================ */
+.captcha-frame{border:1.5px solid var(--ink);background:var(--paper);}
+.captcha-top{
+  background:var(--ink);color:var(--paper);padding:14px 16px;
+  display:flex;flex-direction:column;gap:3px;
+}
+.captcha-top .q{font-family:var(--mono);font-size:10px;letter-spacing:.18em;text-transform:uppercase;opacity:.7;}
+.captcha-top .big{font-size:19px;font-weight:500;}
+.captcha-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;padding:3px;background:var(--ink);}
+.ctile{position:relative;aspect-ratio:1;background:var(--paper-deep);overflow:hidden;cursor:pointer;}
+.ctile svg{position:absolute;inset:0;width:100%;height:100%;}
+.ctile .checkmark{
+  position:absolute;inset:0;background:rgba(232,73,43,.32);
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;transition:opacity .15s;
+}
+.ctile.sel .checkmark{opacity:1;}
+.ctile .checkmark svg{width:38px;height:38px;position:static;}
+
+/* ============================================================
+   Calculating
+   ============================================================ */
+#s-calc{align-items:center;justify-content:center;text-align:center;}
+.calc-wheel{position:relative;width:160px;height:160px;margin:0 auto 34px;}
+.calc-status{font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft);min-height:1.4em;}
+.calc-status.flip{animation:statFlip .4s var(--ease);}
+@keyframes statFlip{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.calc-bar{width:200px;height:6px;border:1.5px solid var(--ink);margin:22px auto 0;position:relative;overflow:hidden;}
+.calc-bar::after{content:"";position:absolute;left:0;top:0;bottom:0;width:0;background:var(--spot);animation:fillBar 5.4s linear forwards;}
+@keyframes fillBar{to{width:100%;}}
+
+/* ============================================================
+   Reveal (typewriter)
+   ============================================================ */
+#s-reveal{padding-bottom:calc(env(safe-area-inset-bottom) + 22px);}
+.reveal-scroll{flex:1 1 auto;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-right:4px;}
+.reveal-body{font-size:18.5px;line-height:1.62;color:var(--ink);font-weight:400;}
+.reveal-body p{margin-bottom:1.1em;}
+.reveal-body .sec-label{
+  font-family:var(--mono);font-size:10px;letter-spacing:.26em;text-transform:uppercase;
+  color:var(--spot);display:block;margin:0 0 8px;
+}
+.reveal-body .done{opacity:1;}
+.caret{display:inline-block;width:2px;height:1em;background:var(--spot);
+  vertical-align:-2px;margin-left:1px;animation:blink 1s steps(1) infinite;}
+@keyframes blink{50%{opacity:0;}}
+.reveal-foot{flex:0 0 auto;padding-top:16px;}
+.next-btn{
+  width:100%;padding:16px;border:1.5px solid var(--ink);background:var(--ink);color:var(--paper);
+  font-family:var(--mono);font-size:13px;letter-spacing:.2em;text-transform:uppercase;
+  display:flex;align-items:center;justify-content:center;gap:12px;
+  transition:transform .15s var(--ease-out),opacity .3s;
+}
+.next-btn:active{transform:translateY(2px);}
+.next-btn[disabled]{opacity:.35;pointer-events:none;}
+
+/* playing card hero */
+.card-stage{
+  flex:1 1 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;
+  perspective:1400px;
+}
+.card-cap{font-family:var(--mono);font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--ink-soft);text-align:center;}
+.tarot{
+  width:212px;height:320px;position:relative;
+  transform-style:preserve-3d;transform:rotateY(180deg) translateY(20px);
+  opacity:0;
+}
+.tarot.dealt{animation:dealCard 1.1s var(--ease) forwards;}
+@keyframes dealCard{
+  0%{transform:rotateY(180deg) translateY(40px) scale(.8);opacity:0;}
+  55%{opacity:1;}
+  100%{transform:rotateY(0deg) translateY(0) scale(1);opacity:1;}
+}
+.tarot .face,.tarot .back{
+  position:absolute;inset:0;backface-visibility:hidden;
+  border:2px solid var(--ink);background:var(--paper);
+  border-radius:10px;box-shadow:0 18px 40px -12px rgba(27,34,51,.5);
+}
+.tarot .back{
+  transform:rotateY(180deg);
+  background:
+    repeating-linear-gradient(45deg, var(--spot-ghost) 0 6px, transparent 6px 12px),
+    var(--paper);
+  display:flex;align-items:center;justify-content:center;
+}
+.tarot .back .star-emb{width:60%;height:60%;}
+.tarot .face{padding:14px;display:flex;flex-direction:column;justify-content:space-between;}
+.tarot .corner{display:flex;flex-direction:column;align-items:center;line-height:.9;width:34px;}
+.tarot .corner.br{align-self:flex-end;transform:rotate(180deg);}
+.tarot .corner .v{font-size:26px;font-weight:700;font-family:var(--serif);}
+.tarot .corner .s{font-size:22px;line-height:1;}
+.tarot .pip-center{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;}
+.tarot .pip-center span{font-size:96px;line-height:1;}
+.tarot.red{--cc:var(--spot-deep);}
+.tarot.black{--cc:var(--ink);}
+.tarot .v,.tarot .s,.tarot .pip-center span{color:var(--cc);}
+.tarot .tframerule{
+  position:absolute;inset:8px;border:1px solid var(--line-strong);border-radius:6px;pointer-events:none;
+}
+
+/* ============================================================
+   Footer credit + cheat sheet
+   ============================================================ */
+.credit{
+  flex:0 0 auto;text-align:center;
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-soft);opacity:.5;padding-top:14px;
+  overflow-wrap:break-word;
+}
+.credit .ig{color:var(--spot);opacity:.9;}
+#cheat{
+  position:fixed;left:50%;bottom:14px;transform:translateX(-50%);
+  z-index:200;width:min(380px,90vw);
+  background:var(--ink);color:var(--paper);
+  border:1.5px solid var(--spot);
+  font-family:var(--mono);font-size:11px;line-height:1.5;
+  padding:14px 16px;display:none;
+}
+#cheat.show{display:block;animation:fadeUp .3s var(--ease-out);}
+#cheat h4{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--spot);margin-bottom:8px;}
+#cheat .armed{font-size:15px;color:var(--paper);margin-bottom:10px;}
+#cheat .armed b{color:var(--spot);}
+#cheat .maps{opacity:.75;font-size:10px;}
+#cheat .x{position:absolute;top:8px;right:12px;cursor:pointer;color:var(--spot);font-size:14px;}
+
+/* info button */
+.info-btn{
+  position:absolute;top:calc(env(safe-area-inset-top) + 22px);right:26px;z-index:55;
+  width:30px;height:30px;border:1.5px solid var(--ink);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--mono);font-style:italic;font-size:15px;font-weight:700;
+  background:var(--paper);
+}
+#infoModal{
+  position:fixed;inset:0;z-index:210;background:rgba(27,34,51,.86);
+  display:none;align-items:center;justify-content:center;padding:30px;
+}
+#infoModal.show{display:flex;animation:fadeUp .3s var(--ease-out);}
+.info-card{
+  width:min(380px,92vw);background:var(--paper);border:2px solid var(--ink);padding:30px 26px;text-align:center;
+}
+.info-card .eyebrow{justify-content:center;margin-bottom:18px;}
+.info-card h3{font-size:28px;margin-bottom:14px;}
+.info-card p{font-size:15px;line-height:1.5;color:var(--ink-soft);margin-bottom:18px;}
+.info-card a{
+  display:inline-block;font-family:var(--mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--paper);background:var(--spot);padding:11px 20px;text-decoration:none;border:1.5px solid var(--spot-deep);
+}
+.info-card .close{margin-top:16px;font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft);}
+
+/* scrollbar */
+::-webkit-scrollbar{width:0;height:0;}
+
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.05ms!important;}
+  .tarot{transform:rotateY(0) translateY(0);opacity:1;}
+}
+@media (max-height:680px){
+  h1.display{font-size:clamp(34px,10vw,46px);}
+  .welcome-lede{font-size:15px;margin-bottom:18px;}
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="stage">
+
+    <button class="info-btn" id="infoBtn" aria-label="About">i</button>
+
+    <!-- ================= 1 · WELCOME ================= -->
+    <section class="screen" id="s-welcome">
+      <div class="welcome-bg">
+        <div class="tiles"></div>
+        <div class="gridhint"></div>
+        <div class="kingband"><span>— · The Long Road · —</span></div>
+      </div>
+      <svg class="welcome-stars" viewBox="0 0 430 800" preserveAspectRatio="xMidYMid slice">
+        <g fill="none" stroke="#e8492b" stroke-width="1" opacity=".5">
+          <circle cx="350" cy="120" r="3"/><circle cx="80" cy="300" r="2.4"/>
+          <circle cx="370" cy="470" r="2.2"/><circle cx="60" cy="560" r="3"/>
+          <path d="M350 120 L80 300 L370 470 L60 560" stroke-dasharray="3 6"/>
+          <path d="M40 90 l5 -14 l5 14 l14 5 l-14 5 l-5 14 l-5 -14 l-14 -5 z" transform="translate(300,40) scale(1.4)"/>
+          <path d="M40 90 l5 -14 l5 14 l14 5 l-14 5 l-5 14 l-5 -14 l-14 -5 z" transform="translate(-10,420) scale(1.1)"/>
+        </g>
+      </svg>
+      <div class="welcome-content">
+        <div class="eyebrow"><span class="num">01</span><span>— Begin</span></div>
+        <h1 class="display misreg" data-text="Welcome to your astrology reading">Welcome to your astrology reading</h1>
+        <p class="welcome-lede">A short, searching quiz to read your stars — and, perhaps, the card you're holding in mind.</p>
+        <span class="begin-chip">Tap anywhere to begin <span class="arrow">→</span></span>
+      </div>
+    </section>
+
+    <!-- ================= 2 · GENDER (suit) ================= -->
+    <section class="screen" id="s-gender">
+      <div class="screen-head">
+        <div class="eyebrow"><span class="num">02</span><span>— Identity</span><span class="rule"></span></div>
+        <h2 class="display">What's your <span class="serif-it spot-ink">gender</span>?</h2>
+      </div>
+      <div class="screen-body stagger" style="justify-content:center;">
+        <div class="choice-stack">
+          <button class="btn-line gender-btn" data-gender="Male"><span>Male</span><span class="tag">A</span>
+            <span class="quarters"><span data-suit="0"></span><span data-suit="1"></span><span data-suit="2"></span><span data-suit="3"></span></span></button>
+          <button class="btn-line gender-btn" data-gender="Female"><span>Female</span><span class="tag">B</span>
+            <span class="quarters"><span data-suit="0"></span><span data-suit="1"></span><span data-suit="2"></span><span data-suit="3"></span></span></button>
+          <button class="btn-line gender-btn" data-gender="Other"><span>Other</span><span class="tag">C</span>
+            <span class="quarters"><span data-suit="0"></span><span data-suit="1"></span><span data-suit="2"></span><span data-suit="3"></span></span></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 3 · STAR SIGN ================= -->
+    <section class="screen" id="s-star">
+      <div class="screen-head">
+        <div class="eyebrow"><span class="num">03</span><span>— The Heavens</span><span class="rule"></span></div>
+        <h2 class="display">What's your <span class="serif-it spot-ink">star sign</span>?</h2>
+      </div>
+      <div class="screen-body">
+        <div class="choice-grid" id="star-grid"></div>
+      </div>
+    </section>
+
+    <!-- ================= 4 · CHINESE ZODIAC ================= -->
+    <section class="screen" id="s-chinese">
+      <div class="screen-head">
+        <div class="eyebrow"><span class="num">04</span><span>— The Cycle</span><span class="rule"></span></div>
+        <h2 class="display">Your <span class="serif-it spot-ink">Chinese zodiac</span>?</h2>
+      </div>
+      <div class="screen-body">
+        <div class="choice-grid" id="chinese-grid"></div>
+      </div>
+    </section>
+
+    <!-- ================= 5 · POWER RANGER ================= -->
+    <section class="screen" id="s-ranger">
+      <div class="screen-head">
+        <div class="eyebrow"><span class="num">05</span><span>— Allegiance</span><span class="rule"></span></div>
+        <h2 class="display">If you were a <span class="serif-it spot-ink">ranger</span>...</h2>
+      </div>
+      <div class="screen-body">
+        <div class="choice-grid cols2" id="ranger-grid"></div>
+      </div>
+    </section>
+
+    <!-- ================= 6 · MAD-LIBS ================= -->
+    <section class="screen" id="s-madlib">
+      <div class="screen-head">
+        <div class="eyebrow"><span class="num">06</span><span>— In Your Words</span><span class="rule"></span></div>
+        <h2 class="display">Fill in the <span class="serif-it spot-ink">blanks</span>.</h2>
+      </div>
+      <div class="screen-body stagger" style="justify-content:center;">
+        <p class="madlib">When I am at
+          <span class="blank"><input id="ml-1" type="text" placeholder="place" autocomplete="off" spellcheck="false"></span>,
+          I like to
+          <span class="blank"><input id="ml-2" type="text" placeholder="verb" autocomplete="off" spellcheck="false"></span>
+          with
+          <span class="blank"><input id="ml-3" type="text" placeholder="someone" autocomplete="off" spellcheck="false"></span>.
+        </p>
+        <button class="next-btn" id="ml-go" style="margin-top:34px;">Continue <span>→</span></button>
+      </div>
+    </section>
+
+    <!-- ================= 7 · CAPTCHA ================= -->
+    <section class="screen" id="s-captcha">
+      <div class="screen-head">
+        <div class="eyebrow"><span class="num">07</span><span>— Verification</span><span class="rule"></span></div>
+        <h2 class="display" style="font-size:clamp(26px,7vw,33px);">Prove you're <span class="serif-it spot-ink">human</span>.</h2>
+      </div>
+      <div class="screen-body stagger" style="justify-content:center;">
+        <div class="captcha-frame">
+          <div class="captcha-top">
+            <span class="q">Step 07 of ∞</span>
+            <span class="big">Select all squares with traffic lights</span>
+          </div>
+          <div class="captcha-grid" id="captcha-grid"></div>
+        </div>
+        <button class="next-btn" id="cap-verify" style="margin-top:22px;">Verify</button>
+      </div>
+    </section>
+
+    <!-- ================= 8 · WORM ================= -->
+    <section class="screen" id="s-worm">
+      <div class="screen-head">
+        <div class="eyebrow"><span class="num">08</span><span>— The Test</span><span class="rule"></span></div>
+      </div>
+      <div class="screen-body stagger" style="justify-content:center;text-align:center;align-items:center;">
+        <svg width="120" height="80" viewBox="0 0 120 80" style="margin-bottom:6px;">
+          <path d="M10 60 Q25 30 40 55 T70 50 T100 55" fill="none" stroke="#e8492b" stroke-width="6" stroke-linecap="round"/>
+          <circle cx="104" cy="52" r="9" fill="#1b2233"/>
+          <circle cx="107" cy="49" r="2" fill="#f3ead7"/>
+        </svg>
+        <h2 class="display" style="font-size:clamp(27px,7.5vw,36px);max-width:14ch;">If I were a worm, would you still <span class="serif-it spot-ink">love me</span>?</h2>
+        <div class="choice-stack" style="width:100%;max-width:300px;margin-top:30px;">
+          <button class="btn-line worm-btn" data-worm="Yes" style="justify-content:center;font-style:italic;">Yes</button>
+          <button class="btn-line worm-btn" data-worm="No" style="justify-content:center;font-style:italic;">No</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= 9 · CALCULATING ================= -->
+    <section class="screen" id="s-calc">
+      <div class="eyebrow" style="position:absolute;top:calc(env(safe-area-inset-top) + 26px);left:30px;"><span class="num">09</span><span>— Computation</span></div>
+      <div class="calc-wheel">
+        <svg viewBox="0 0 160 160" width="160" height="160">
+          <circle cx="80" cy="80" r="62" fill="none" stroke="#1b2233" stroke-width="1" opacity=".25"/>
+          <circle cx="80" cy="80" r="74" fill="none" stroke="#1b2233" stroke-width="1" opacity=".15"/>
+          <g id="calc-spin" style="transform-origin:80px 80px;">
+            <circle cx="80" cy="18" r="4" fill="#e8492b"/>
+            <path d="M80 80 L80 22" stroke="#1b2233" stroke-width="1.4"/>
+            <path d="M80 80 L122 110" stroke="#e8492b" stroke-width="1.4"/>
+            <circle cx="80" cy="80" r="6" fill="#1b2233"/>
+            <g fill="none" stroke="#1b2233" stroke-width="1" opacity=".5">
+              <path d="M80 30 l3 -8 l3 8 l8 3 l-8 3 l-3 8 l-3 -8 l-8 -3 z"/>
+            </g>
+          </g>
+        </svg>
+      </div>
+      <div class="display serif-it" style="font-size:30px;margin-bottom:10px;">Reading your stars</div>
+      <div class="calc-status" id="calc-status">Aligning your stars...</div>
+      <div class="calc-bar"></div>
+    </section>
+
+    <!-- ================= 10 · REVEAL ================= -->
+    <section class="screen" id="s-reveal">
+      <div class="screen-head">
+        <div class="eyebrow"><span class="num">10</span><span>— Your Reading</span><span class="rule"></span></div>
+      </div>
+      <div class="reveal-scroll" id="reveal-scroll">
+        <div class="reveal-body" id="reveal-body"></div>
+        <div class="card-stage" id="card-stage" style="display:none;">
+          <div class="card-cap" id="card-cap"></div>
+          <div class="tarot" id="tarot">
+            <div class="back">
+              <svg class="star-emb" viewBox="0 0 100 100" fill="none" stroke="#c93a20" stroke-width="2">
+                <path d="M50 10 l8 26 l28 0 l-22 16 l8 26 l-22 -16 l-22 16 l8 -26 l-22 -16 l28 0 z"/>
+              </svg>
+            </div>
+            <div class="face">
+              <div class="tframerule"></div>
+              <div class="corner tl"><span class="v" id="tv1"></span><span class="s" id="ts1"></span></div>
+              <div class="pip-center"><span id="tpip"></span></div>
+              <div class="corner br"><span class="v" id="tv2"></span><span class="s" id="ts2"></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="reveal-foot">
+        <button class="next-btn" id="reveal-next">Next <span>→</span></button>
+        <div class="credit" id="credit">A webapp by Kenneth Aidan Foo · <span class="ig">@oddpaq</span></div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<!-- performer cheat-sheet -->
+<div id="cheat">
+  <span class="x" id="cheat-x">✕</span>
+  <h4>// Performer</h4>
+  <div class="armed" id="cheat-armed">— · —</div>
+  <div class="maps" id="cheat-maps"></div>
+</div>
+
+<!-- info modal -->
+<div id="infoModal">
+  <div class="info-card">
+    <div class="eyebrow" style="color:var(--spot);"><span>✦</span><span>Celestial Press</span></div>
+    <h3 class="display serif-it">Signs</h3>
+    <p>A printed fortune-teller's booklet, set in two inks on paper. Part of a small family of curiosities.</p>
+    <a href="https://www.instagram.com/oddpaq" target="_blank" rel="noopener">Follow @oddpaq</a>
+    <div class="close" id="info-close">Tap to dismiss</div>
+  </div>
+</div>
+
+<script>
+"use strict";
+(function(){
+/* ============================================================
+   STATE
+   ============================================================ */
+const VALUES = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
+const SUITS  = [ /* CHaSeD order */
+  {name:"Clubs",   sym:"♣", color:"black"},
+  {name:"Hearts",  sym:"♥", color:"red"},
+  {name:"Spades",  sym:"♠", color:"black"},
+  {name:"Diamonds",sym:"♦", color:"red"},
+];
+const state = {
+  value:null,   // index 0..12
+  suit:null,    // index 0..3
+  sign:null,    // {name,glyph}
+  answers:{},
+};
+
+/* ============================================================
+   SCREEN MACHINE
+   ============================================================ */
+const order = ["s-welcome","s-gender","s-star","s-chinese","s-ranger","s-madlib","s-captcha","s-worm","s-calc","s-reveal"];
+let curIdx = 0;
+const screens = {};
+order.forEach(id=>screens[id]=document.getElementById(id));
+
+function show(id, enter="enter-right"){
+  const next = screens[id];
+  const cur = screens[order[curIdx]];
+  if(cur && cur!==next){
+    cur.classList.remove("active","enter-right","enter-fade");
+    cur.classList.add("leaving");
+    setTimeout(()=>cur.classList.remove("leaving"),520);
+  }
+  next.classList.remove("leaving");
+  // restart enter animation
+  next.classList.remove("enter-right","enter-fade");
+  void next.offsetWidth;
+  next.classList.add("active", enter);
+  curIdx = order.indexOf(id);
+  if(id==="s-calc") runCalc();
+  if(id==="s-reveal") startReveal();
+}
+
+/* small response stamp then advance */
+function respond(word, nextId, enter){
+  const wrap = document.createElement("div");
+  wrap.className="stamp-wrap";
+  wrap.innerHTML=`<div class="stamp" data-t="${word}">${word}</div>`;
+  document.getElementById("stage").appendChild(wrap);
+  void wrap.offsetWidth;
+  wrap.classList.add("show");
+  setTimeout(()=>{ show(nextId, enter||"enter-right"); }, 760);
+  setTimeout(()=>wrap.remove(), 1100);
+}
+
+/* ============================================================
+   1 · WELCOME — value capture (13 zones)
+   ============================================================ */
+const welcome = document.getElementById("s-welcome");
+let welcomeFired=false;
+welcome.addEventListener("pointerdown", e=>{
+  if(welcomeFired) return;
+  welcomeFired=true;
+  const r = welcome.getBoundingClientRect();
+  const x = e.clientX - r.left;
+  const y = e.clientY - r.top;
+  const kingTop = r.height - 78;
+  let v;
+  if(y >= kingTop){
+    v = 12; // King
+  } else {
+    const col = Math.min(3, Math.floor(x / (r.width/4)));
+    const row = Math.min(2, Math.floor(y / (kingTop/3)));
+    v = row*4 + col; // 0..11
+  }
+  state.value = v;
+  updateCheat();
+  // ink bleed feedback
+  const blot = document.createElement("div");
+  blot.className="inkblot";
+  blot.style.left = e.clientX - r.left + "px";
+  blot.style.top  = e.clientY - r.top + "px";
+  welcome.appendChild(blot);
+  setTimeout(()=>blot.remove(),600);
+  setTimeout(()=>show("s-gender","enter-right"), 260);
+});
+
+/* ============================================================
+   2 · GENDER — suit capture (4 quarters)
+   ============================================================ */
+document.querySelectorAll(".gender-btn").forEach(btn=>{
+  btn.querySelectorAll(".quarters span").forEach(q=>{
+    q.addEventListener("pointerdown", e=>{
+      e.stopPropagation();
+      const suit = parseInt(q.dataset.suit,10);
+      state.suit = suit;
+      state.answers.gender = btn.dataset.gender;
+      updateCheat();
+      btn.classList.add("picked");
+      respond("OK!", "s-star");
+    });
+  });
+});
+
+/* ============================================================
+   3 · STAR SIGN
+   ============================================================ */
+const ZODIAC = [
+  {name:"Aries",glyph:"♈"},{name:"Taurus",glyph:"♉"},{name:"Gemini",glyph:"♊"},
+  {name:"Cancer",glyph:"♋"},{name:"Leo",glyph:"♌"},{name:"Virgo",glyph:"♍"},
+  {name:"Libra",glyph:"♎"},{name:"Scorpio",glyph:"♏"},{name:"Sagittarius",glyph:"♐"},
+  {name:"Capricorn",glyph:"♑"},{name:"Aquarius",glyph:"♒"},{name:"Pisces",glyph:"♓"},
+];
+const starGrid = document.getElementById("star-grid");
+ZODIAC.forEach(z=>{
+  const c=document.createElement("button");
+  c.className="cell";
+  c.innerHTML=`<span class="glyph">${z.glyph}</span><span class="nm">${z.name}</span>`;
+  c.addEventListener("pointerdown",()=>{
+    state.sign = z;
+    state.answers.sign = z.name;
+    c.classList.add("picked");
+    respond("Great!","s-chinese");
+  });
+  starGrid.appendChild(c);
+});
+
+/* ============================================================
+   4 · CHINESE ZODIAC
+   ============================================================ */
+/* Stroked, single-ink SVG marks for each animal — keeps the strict
+   two-ink rule (full-colour emoji would break it on most devices). */
+const ANIMAL_ART={
+  Rat:'<circle cx="22" cy="20" r="6"/><circle cx="36" cy="14" r="11"/><circle cx="32" cy="9" r="3"/><circle cx="42" cy="9" r="3"/><path d="M14 20 Q4 22 6 30"/>',
+  Ox:'<path d="M18 18 Q24 30 36 30 Q48 30 54 18"/><path d="M18 18 Q8 8 14 6"/><path d="M54 18 Q64 8 58 6"/><circle cx="29" cy="22" r="1.6"/><circle cx="43" cy="22" r="1.6"/>',
+  Tiger:'<circle cx="36" cy="22" r="14"/><path d="M24 12 L20 6 M48 12 L52 6"/><path d="M30 8 L31 14 M42 8 L41 14"/><circle cx="31" cy="22" r="1.6"/><circle cx="41" cy="22" r="1.6"/><path d="M36 26 L36 30"/>',
+  Rabbit:'<circle cx="36" cy="26" r="10"/><path d="M30 17 Q28 4 33 5 Q36 12 34 18 M42 17 Q44 4 39 5 Q36 12 38 18"/><circle cx="32" cy="26" r="1.5"/><circle cx="40" cy="26" r="1.5"/>',
+  Dragon:'<path d="M14 30 Q14 14 30 14 Q44 14 44 24 Q44 30 38 30"/><path d="M30 8 L28 14 M38 9 L36 15"/><circle cx="26" cy="20" r="1.6"/><path d="M44 24 Q56 22 58 32 Q50 32 48 36"/>',
+  Snake:'<path d="M50 10 Q34 10 34 20 Q34 30 20 30 Q10 30 14 38"/><circle cx="49" cy="13" r="1.4"/><path d="M14 38 L9 41 M14 38 L9 35"/>',
+  Horse:'<path d="M16 36 Q12 16 30 12 Q38 10 42 6"/><path d="M30 12 Q44 14 46 30"/><path d="M42 6 Q34 8 34 14"/><circle cx="32" cy="20" r="1.5"/>',
+  Goat:'<path d="M22 18 Q22 32 36 32 Q50 32 50 18"/><path d="M22 18 Q14 12 18 6 M50 18 Q58 12 54 6"/><path d="M34 32 L34 40 M38 32 L38 40"/><circle cx="30" cy="22" r="1.4"/><circle cx="42" cy="22" r="1.4"/>',
+  Monkey:'<circle cx="36" cy="22" r="13"/><circle cx="22" cy="20" r="4"/><circle cx="50" cy="20" r="4"/><circle cx="31" cy="22" r="1.6"/><circle cx="41" cy="22" r="1.6"/><path d="M30 28 Q36 33 42 28"/>',
+  Rooster:'<path d="M26 36 Q22 18 34 16 Q40 15 40 10"/><path d="M34 16 L46 22 L40 30"/><path d="M40 10 Q34 6 30 10 M40 10 Q46 6 48 12"/><circle cx="37" cy="20" r="1.4"/>',
+  Dog:'<circle cx="36" cy="24" r="11"/><path d="M25 16 Q18 14 20 26 M47 16 Q54 14 52 26"/><circle cx="31" cy="23" r="1.6"/><circle cx="41" cy="23" r="1.6"/><path d="M33 29 Q36 32 39 29"/>',
+  Pig:'<circle cx="36" cy="24" r="12"/><ellipse cx="36" cy="27" rx="6" ry="4"/><circle cx="34" cy="27" r="1.2"/><circle cx="38" cy="27" r="1.2"/><path d="M27 14 L24 8 M45 14 L48 8"/>',
+};
+const ANIMALS=["Rat","Ox","Tiger","Rabbit","Dragon","Snake","Horse","Goat","Monkey","Rooster","Dog","Pig"];
+const chGrid=document.getElementById("chinese-grid");
+ANIMALS.forEach(name=>{
+  const c=document.createElement("button");
+  c.className="cell";
+  c.innerHTML=`<span class="glyph"><svg class="animal" viewBox="0 0 72 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${ANIMAL_ART[name]}</svg></span><span class="nm">${name}</span>`;
+  c.addEventListener("pointerdown",()=>{
+    state.answers.animal=name;
+    c.classList.add("picked");
+    respond("很好!","s-ranger");
+  });
+  chGrid.appendChild(c);
+});
+
+/* ============================================================
+   5 · POWER RANGER
+   ============================================================ */
+const RANGERS=[
+  {name:"Red",hex:"#e8492b"},{name:"Blue",hex:"#33507a"},{name:"Black",hex:"#1b2233"},
+  {name:"Yellow",hex:"#d8a32e"},{name:"Pink",hex:"#cf6f8f"},{name:"Green",hex:"#4a7a52"},
+];
+const rGrid=document.getElementById("ranger-grid");
+RANGERS.forEach(r=>{
+  const c=document.createElement("button");
+  c.className="cell";
+  c.style.aspectRatio="1/0.78";
+  c.innerHTML=`<span class="swatch" style="background:${r.hex}"></span><span class="nm">${r.name}</span>`;
+  c.addEventListener("pointerdown",()=>{
+    state.answers.ranger=r.name;
+    c.classList.add("picked");
+    respond("Strong Choice!","s-madlib","enter-fade");
+  });
+  rGrid.appendChild(c);
+});
+
+/* ============================================================
+   6 · MAD-LIBS
+   ============================================================ */
+document.getElementById("ml-go").addEventListener("pointerdown",()=>{
+  state.answers.madlib=[
+    document.getElementById("ml-1").value||"home",
+    document.getElementById("ml-2").value||"dream",
+    document.getElementById("ml-3").value||"friends",
+  ];
+  respond("Insightful!","s-captcha");
+});
+
+/* ============================================================
+   7 · CAPTCHA
+   ============================================================ */
+const capGrid=document.getElementById("captcha-grid");
+// which tiles draw a traffic light (purely cosmetic)
+const lights=[1,2,5,7];
+function tileSVG(hasLight){
+  if(hasLight){
+    return `<svg viewBox="0 0 100 100">
+      <rect x="0" y="0" width="100" height="100" fill="#dcd0b4"/>
+      <rect x="38" y="22" width="24" height="56" rx="6" fill="#1b2233"/>
+      <circle cx="50" cy="34" r="7" fill="#e8492b"/>
+      <circle cx="50" cy="50" r="7" fill="#d8a32e"/>
+      <circle cx="50" cy="66" r="7" fill="#4a7a52"/>
+      <rect x="46" y="78" width="8" height="14" fill="#1b2233"/>
+    </svg>`;
+  }
+  const opts=[
+    `<rect width="100" height="100" fill="#d3c7aa"/><path d="M0 70 L40 40 L70 65 L100 45 L100 100 L0 100 Z" fill="#b9ac8c"/><circle cx="76" cy="26" r="10" fill="#e8b14a"/>`,
+    `<rect width="100" height="100" fill="#cfc4a8"/><rect x="20" y="30" width="60" height="50" fill="#a99c7d"/><rect x="34" y="46" width="14" height="14" fill="#85795d"/><rect x="54" y="46" width="14" height="14" fill="#85795d"/>`,
+    `<rect width="100" height="100" fill="#d8ccae"/><path d="M50 18 L70 80 L30 80 Z" fill="#7f9b7a"/><rect x="46" y="80" width="8" height="14" fill="#6b5a44"/>`,
+    `<rect width="100" height="100" fill="#d3c7ab"/><circle cx="50" cy="50" r="22" fill="#c9803f"/><circle cx="50" cy="50" r="10" fill="#a5632c"/>`,
+    `<rect width="100" height="100" fill="#cec2a6"/><path d="M10 80 L40 30 L60 55 L80 35 L95 80 Z" fill="#9aaf9a"/>`,
+  ];
+  return `<svg viewBox="0 0 100 100">${opts[Math.floor(Math.random()*opts.length)]}</svg>`;
+}
+for(let i=0;i<9;i++){
+  const t=document.createElement("div");
+  t.className="ctile";
+  t.innerHTML=tileSVG(lights.includes(i)) +
+    `<div class="checkmark"><svg viewBox="0 0 40 40" fill="none" stroke="#c93a20" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 21 L17 30 L33 11"/></svg></div>`;
+  t.addEventListener("pointerdown",()=>t.classList.toggle("sel"));
+  capGrid.appendChild(t);
+}
+document.getElementById("cap-verify").addEventListener("pointerdown",()=>{
+  respond("Are you sure...?","s-worm");
+});
+
+/* ============================================================
+   8 · WORM
+   ============================================================ */
+document.querySelectorAll(".worm-btn").forEach(b=>{
+  b.addEventListener("pointerdown",()=>{
+    state.answers.worm=b.dataset.worm;
+    b.classList.add("picked");
+    respond("okay...","s-calc","enter-fade");
+  });
+});
+
+/* ============================================================
+   9 · CALCULATING
+   ============================================================ */
+const CALC_LINES=[
+  "Aligning your stars...","Consulting the aether...","Cross-referencing your sign...",
+  "Shuffling the deck of fate...","Reading the negative space...","Decoding the marginalia...",
+];
+let calcTimer=null, calcAdvance=null;
+function runCalc(){
+  const spin=document.getElementById("calc-spin");
+  let rot=0;
+  const spinTimer=setInterval(()=>{ rot+=6; spin.style.transform=`rotate(${rot}deg)`; },30);
+  const statusEl=document.getElementById("calc-status");
+  let li=0;
+  statusEl.textContent=CALC_LINES[0];
+  calcTimer=setInterval(()=>{
+    li=(li+1)%CALC_LINES.length;
+    statusEl.classList.remove("flip");void statusEl.offsetWidth;
+    statusEl.textContent=CALC_LINES[li];
+    statusEl.classList.add("flip");
+  },1000);
+  calcAdvance=setTimeout(()=>{
+    clearInterval(calcTimer);clearInterval(spinTimer);
+    show("s-reveal","enter-fade");
+  }, 5400);
+}
+
+/* ============================================================
+   DATE ORDINAL
+   ============================================================ */
+const ONES=["","first","second","third","fourth","fifth","sixth","seventh","eighth","ninth","tenth",
+  "eleventh","twelfth","thirteenth","fourteenth","fifteenth","sixteenth","seventeenth","eighteenth","nineteenth","twentieth",
+  "twenty-first","twenty-second","twenty-third","twenty-fourth","twenty-fifth","twenty-sixth","twenty-seventh","twenty-eighth","twenty-ninth","thirtieth","thirty-first"];
+const MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
+function dateOrdinal(){
+  const d=new Date();
+  return "the "+ONES[d.getDate()]+" day of "+MONTHS[d.getMonth()];
+}
+
+/* ============================================================
+   REVEAL COPY
+   ============================================================ */
+const COPY = {
+  internal:{
+    A:"You are a person prone to bouts of real self-examination. This is in sharp contrast to a striking ability you have developed to appear socially very engaged, even the life and soul of the party; but in a way that only convinces others.",
+    B:"You will often be at a gathering and find yourself playing a part. While on the one hand you'll be talkative and funny, you'll be detaching yourself to the point where you will find yourself watching everything going on around you and feeling utterly unable to engage.",
+    C:"You play conversations back to yourself in your head and wonder what that person really meant when they said such-and-such."
+  },
+  conflict:{
+    A:"You learned to deal with conflict by exercising control. You like to show a calm, self-assured, fluid kind of stability (but because this is self-consciously created, it will create bouts of frustrated silliness and a delight in extremes, or at least a delight in being seen to be extreme). You most easily recognise this control in how you are with the people around you.",
+    B:"You have learned to protect yourself by keeping people at bay. Because in the past you have learned to be disappointed by people, you instinctively keep people at arm's length, until you decide they are to be allowed over that line into your group of close friends. However, once across that line, the problem is that an emotional dependency kicks in which leaves you feeling very hurt or rejected if it appears they have betrayed that status.",
+    C:"Because you are prone to self-examination, you will be aware of these traits. However, you are unusually able to examine even that self-examination, which means that you have become concerned about what the real you is."
+  },
+  hobbies:{
+    A:"You are creative, and have tried different avenues to utilise that ability. It may not be that you specifically, say, paint; it may be that your creativity shows itself in more subtle ways, but you will certainly find yourself having vivid and well-formed ideas which others find hard to grasp.",
+    B:"You set high standards for yourself, and in many ways are a bit of a perfectionist. The problem is that it means you often don't get stuff done, because you are frustrated by the idea of mediocrity and wearied by the idea of starting something afresh. However, once your brain is engaged you'll find yourself sailing. Very likely this will have led you to consider writing a novel or some such, but a fear that you won't quite achieve what you want stops you getting on with it.",
+    C:"There are ways in which you have been made to feel isolated from certain groups in the past — something of an outsider. Now what is happening is that you are taking that outsider role and defending it to the point of consciously avoiding being part of a group. This will serve you enormously well in your creative and career pursuits. You have an enormous cynicism towards those who prefer to be part of a group, and you always feel a pang of disappointment when your 'close' friends seem to follow that route."
+  },
+  assertions:{
+    A:"You have links at the moment with America, which are quite interesting and will look to yield worthwhile results. You're naturally a little disorganised. A look around your living space would show a box of photos unorganised into albums, out-of-date medicines, broken items not thrown out, and notes to yourself which are significantly out of date.",
+    B:"You tend to lack motivation. Because you're resourceful and talented enough to be pretty successful when you put your mind to things, this encourages you to procrastinate and put them off. Equally, you've given up dreams a little easily when your mind flitted elsewhere. There are in your home signs of an excursion into playing a musical instrument which you have since abandoned, or are finding yourself less interested in. (This may alternatively relate to poetry or creative writing you've briefly tried your hand at and left behind.)"
+  },
+  conclusion:"It's very interesting doing your reading. You are certainly bright, and open to life's possibilities — something not normally found among achieving people. You would do well to be less self-absorbed, as it tends to distance you a little. You could let people in a little more — I am aware there is a side you feel you should hide — but you really have an appealing personality, and also..."
+};
+function pick(o){const k=Object.keys(o);return o[k[Math.floor(Math.random()*k.length)]];}
+
+let revealSections=[];
+let revealStep=0;
+let typing=false;
+function buildSections(){
+  const glyph = state.sign ? state.sign.glyph : "✶";
+  const intro = `Hello ${glyph}. Welcome to your astrology reading on ${dateOrdinal()}. Here is your reading...`;
+  revealSections=[
+    {label:"Intro", text:intro},
+    {label:"Internal World", text:pick(COPY.internal)},
+    {label:"Conflict", text:pick(COPY.conflict)},
+    {label:"Hobbies", text:pick(COPY.hobbies)},
+    {label:"Assertions", text:pick(COPY.assertions)},
+    {label:"Conclusion", text:COPY.conclusion},
+    {label:"__CARD__"},
+  ];
+}
+
+const revealBody=document.getElementById("reveal-body");
+const revealScroll=document.getElementById("reveal-scroll");
+const revealNext=document.getElementById("reveal-next");
+const cardStage=document.getElementById("card-stage");
+
+function startReveal(){
+  if(state.value===null) state.value=Math.floor(Math.random()*13);
+  if(state.suit===null) state.suit=Math.floor(Math.random()*4);
+  updateCheat();
+  buildSections();
+  revealStep=0;
+  revealBody.innerHTML="";
+  cardStage.style.display="none";
+  revealNext.style.display="";
+  revealNext.innerHTML='Next <span>→</span>';
+  typeSection(0);
+}
+
+function typeSection(i){
+  const sec=revealSections[i];
+  if(sec.label==="__CARD__"){ revealCard(); return; }
+  typing=true; revealNext.setAttribute("disabled","");
+  const block=document.createElement("div");
+  block.style.marginBottom="1.4em";
+  const lab=document.createElement("span");
+  lab.className="sec-label";
+  lab.textContent = (i===0? "Intro" : sec.label);
+  const p=document.createElement("p");
+  const caret=document.createElement("span");caret.className="caret";
+  block.appendChild(lab);block.appendChild(p);p.appendChild(caret);
+  revealBody.appendChild(block);
+  revealScroll.scrollTop=revealScroll.scrollHeight;
+
+  const txt=sec.text;
+  let ci=0;
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const speed = reduced ? 0 : 16;
+  function step(){
+    if(ci<=txt.length){
+      p.textContent=txt.slice(0,ci);
+      p.appendChild(caret);
+      ci+= reduced?txt.length: (1 + (Math.random()<0.12?1:0));
+      revealScroll.scrollTop=revealScroll.scrollHeight;
+      if(ci<=txt.length){ setTimeout(step, speed + (txt[ci-1]==='.'?80:0)); return; }
+    }
+    p.textContent=txt; // finalise
+    caret.remove();
+    typing=false;
+    revealNext.removeAttribute("disabled");
+    if(i===revealSections.length-2){ revealNext.innerHTML='Reveal <span>✦</span>'; }
+    revealScroll.scrollTop=revealScroll.scrollHeight;
+  }
+  step();
+}
+
+revealNext.addEventListener("pointerdown",()=>{
+  if(typing) return;
+  revealStep++;
+  if(revealStep<revealSections.length){
+    typeSection(revealStep);
+  }
+});
+
+function revealCard(){
+  revealNext.style.display="none";
+  cardStage.style.display="flex";
+  const v=VALUES[state.value], s=SUITS[state.suit];
+  const valFull=["Ace","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Jack","Queen","King"][state.value];
+  document.getElementById("card-cap").innerHTML=`✦ &nbsp; You picked the ${valFull} of ${s.name} &nbsp; ✦`;
+  document.getElementById("tv1").textContent=v;
+  document.getElementById("tv2").textContent=v;
+  document.getElementById("ts1").textContent=s.sym;
+  document.getElementById("ts2").textContent=s.sym;
+  document.getElementById("tpip").textContent=s.sym;
+  const tarot=document.getElementById("tarot");
+  tarot.classList.remove("red","black");
+  tarot.classList.add(s.color);
+  void tarot.offsetWidth;
+  tarot.classList.add("dealt");
+  revealScroll.scrollTop=revealScroll.scrollHeight;
+}
+
+/* ============================================================
+   CHEAT SHEET (triple-tap credit)
+   ============================================================ */
+const cheat=document.getElementById("cheat");
+const credit=document.getElementById("credit");
+let tapCount=0,tapTimer=null;
+function tripleGuard(){
+  tapCount++;
+  clearTimeout(tapTimer);
+  tapTimer=setTimeout(()=>tapCount=0,500);
+  if(tapCount>=3){
+    tapCount=0;
+    cheat.classList.toggle("show");
+    updateCheat();
+  }
+}
+credit.addEventListener("pointerdown",tripleGuard);
+document.getElementById("cheat-x").addEventListener("pointerdown",()=>cheat.classList.remove("show"));
+function updateCheat(){
+  const v=state.value!=null?VALUES[state.value]:"—";
+  const s=state.suit!=null?SUITS[state.suit].sym+" "+SUITS[state.suit].name:"—";
+  document.getElementById("cheat-armed").innerHTML=`Armed: <b>${v}</b> of <b>${s}</b>`;
+  document.getElementById("cheat-maps").innerHTML=
+    `WELCOME zones (4×3 + King bar):<br>${VALUES.join(" · ")}<br><br>`+
+    `GENDER quarters L→R (CHaSeD):<br>♣ Clubs · ♥ Hearts · ♠ Spades · ♦ Diamonds`;
+}
+updateCheat();
+
+/* ============================================================
+   INFO MODAL
+   ============================================================ */
+const infoModal=document.getElementById("infoModal");
+document.getElementById("infoBtn").addEventListener("pointerdown",()=>infoModal.classList.add("show"));
+document.getElementById("info-close").addEventListener("pointerdown",()=>infoModal.classList.remove("show"));
+infoModal.addEventListener("pointerdown",e=>{ if(e.target===infoModal) infoModal.classList.remove("show"); });
+
+/* ============================================================
+   BOOT
+   ============================================================ */
+screens["s-welcome"].classList.add("active","enter-fade");
+// prevent iOS double-tap zoom / context menu
+document.addEventListener("gesturestart",e=>e.preventDefault());
+document.addEventListener("contextmenu",e=>e.preventDefault());
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
+<title>Signs · Astrology Reading</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Manrope:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --indigo:#1a1535;
+    --plum:#2a1d4a;
+    --midnight:#0c0a1f;
+    --lav:#c9b8ff;
+    --peach:#ffd4b8;
+    --mint:#b8f0dd;
+    --gold:#f3e2b0;
+    --ink:#f4f1ff;
+    --ink-soft:rgba(244,241,255,.66);
+    --ink-faint:rgba(244,241,255,.4);
+    --glass:rgba(255,255,255,.055);
+    --glass-2:rgba(255,255,255,.09);
+    --hair:rgba(201,184,255,.22);
+    --hair-2:rgba(201,184,255,.42);
+    --serif:'Cormorant Garamond',Georgia,serif;
+    --sans:'Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+    --ease:cubic-bezier(.22,.61,.36,1);
+    --ease-soft:cubic-bezier(.4,0,.2,1);
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{
+    font-family:var(--sans);
+    background:var(--midnight);
+    color:var(--ink);
+    overflow:hidden;
+    position:fixed;
+    inset:0;
+    touch-action:manipulation;
+    -webkit-user-select:none;user-select:none;
+    -webkit-font-smoothing:antialiased;
+    font-weight:300;
+  }
+
+  /* ---------- sky / stage ---------- */
+  #sky{
+    position:fixed;inset:0;
+    background:
+      radial-gradient(120% 80% at 50% -10%, #3a2a63 0%, transparent 55%),
+      radial-gradient(100% 70% at 80% 110%, #43275e 0%, transparent 60%),
+      linear-gradient(165deg, #1a1535 0%, #221842 38%, #16112e 72%, #0b091c 100%);
+    z-index:0;
+  }
+  #starfield{position:fixed;inset:0;z-index:1;pointer-events:none;}
+  .orb{
+    position:fixed;border-radius:50%;
+    filter:blur(38px);opacity:.5;z-index:1;pointer-events:none;
+    mix-blend-mode:screen;
+    animation:drift 22s var(--ease-soft) infinite alternate;
+  }
+  .orb.a{width:300px;height:300px;left:-90px;top:-60px;background:radial-gradient(circle,#6b4fb8,transparent 70%);}
+  .orb.b{width:260px;height:260px;right:-80px;bottom:14%;background:radial-gradient(circle,#3f7d8c,transparent 70%);animation-duration:28s;animation-delay:-6s;}
+  .orb.c{width:200px;height:200px;right:18%;top:8%;background:radial-gradient(circle,#b98ad8,transparent 70%);opacity:.32;animation-duration:34s;animation-delay:-12s;}
+  @keyframes drift{from{transform:translate(0,0) scale(1);}to{transform:translate(34px,42px) scale(1.12);}}
+
+  #moon{
+    position:fixed;top:8%;left:50%;width:120px;height:120px;
+    transform:translateX(-50%);border-radius:50%;z-index:1;pointer-events:none;
+    background:radial-gradient(circle at 38% 36%, #fff7e8, #efe3c4 46%, #d8c8b0 100%);
+    box-shadow:0 0 60px 18px rgba(243,226,176,.28), inset -16px -10px 30px rgba(120,100,150,.4);
+    opacity:.0;transition:opacity 2s var(--ease-soft);
+  }
+  #moon.show{opacity:.9;}
+
+  /* ---------- phone column ---------- */
+  #app{
+    position:fixed;inset:0;z-index:5;
+    display:flex;align-items:stretch;justify-content:center;
+  }
+  #frame{
+    position:relative;width:100%;max-width:440px;height:100%;
+    display:flex;flex-direction:column;
+    padding:calc(env(safe-area-inset-top) + 8px) 22px calc(env(safe-area-inset-bottom) + 16px);
+    overflow:hidden;
+  }
+
+  .screen{
+    position:absolute;
+    inset:calc(env(safe-area-inset-top) + 8px) 22px calc(env(safe-area-inset-bottom) + 16px);
+    display:flex;flex-direction:column;
+    opacity:0;visibility:hidden;
+    pointer-events:none;
+    transition:opacity .75s var(--ease-soft), filter .75s var(--ease-soft), transform .75s var(--ease);
+    transform:translateY(26px) scale(.985);
+    filter:blur(14px);
+  }
+  .screen.active{
+    opacity:1;visibility:visible;pointer-events:auto;
+    transform:translateY(0) scale(1);filter:blur(0);
+    transition-delay:.12s;
+  }
+  .screen.leaving{
+    opacity:0;transform:translateY(-22px) scale(.985);filter:blur(14px);
+  }
+
+  /* stagger helper */
+  .stagger>*{opacity:0;transform:translateY(16px);}
+  .screen.active .stagger>*{
+    animation:rise .9s var(--ease) forwards;
+  }
+  .screen.active .stagger>*:nth-child(1){animation-delay:.16s;}
+  .screen.active .stagger>*:nth-child(2){animation-delay:.26s;}
+  .screen.active .stagger>*:nth-child(3){animation-delay:.36s;}
+  .screen.active .stagger>*:nth-child(4){animation-delay:.46s;}
+  .screen.active .stagger>*:nth-child(5){animation-delay:.56s;}
+  .screen.active .stagger>*:nth-child(6){animation-delay:.66s;}
+  @keyframes rise{to{opacity:1;transform:translateY(0);}}
+
+  /* ---------- typography ---------- */
+  .eyebrow{
+    font-size:11px;letter-spacing:.42em;text-transform:uppercase;
+    color:var(--lav);font-weight:500;opacity:.8;
+    margin-bottom:14px;
+  }
+  h1.title{
+    font-family:var(--serif);font-weight:500;
+    font-size:clamp(30px,8vw,42px);line-height:1.06;
+    letter-spacing:.005em;
+    color:var(--ink);
+    text-wrap:balance;
+    overflow-wrap:break-word;
+    text-shadow:0 1px 1px rgba(0,0,0,.5), 0 0 28px rgba(201,184,255,.45);
+  }
+  .lede{
+    font-size:15px;line-height:1.65;color:rgba(244,241,255,.86);
+    font-weight:300;letter-spacing:.01em;
+    text-shadow:0 1px 2px rgba(0,0,0,.5);
+  }
+  .q-title{
+    font-family:var(--serif);font-weight:500;
+    font-size:clamp(28px,7.4vw,38px);line-height:1.08;letter-spacing:.01em;
+  }
+
+  /* ---------- glass card ---------- */
+  .glass{
+    background:var(--glass);
+    backdrop-filter:blur(22px) saturate(140%);
+    -webkit-backdrop-filter:blur(22px) saturate(140%);
+    border:1px solid var(--hair);
+    border-radius:26px;
+    box-shadow:
+      0 12px 40px -18px rgba(0,0,0,.6),
+      inset 0 1px 0 rgba(255,255,255,.12),
+      inset 0 0 36px rgba(150,120,220,.05);
+  }
+
+  /* ---------- option buttons ---------- */
+  .opt{
+    position:relative;
+    background:var(--glass);
+    backdrop-filter:blur(18px) saturate(140%);
+    -webkit-backdrop-filter:blur(18px) saturate(140%);
+    border:1px solid var(--hair);
+    border-radius:20px;
+    color:var(--ink);
+    font-family:var(--sans);font-weight:300;
+    cursor:pointer;
+    transition:transform .4s var(--ease), border-color .4s, background .4s, box-shadow .4s;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.1);
+    overflow:hidden;
+    will-change:transform;
+  }
+  .opt:hover,.opt:focus-visible{
+    border-color:var(--hair-2);
+    background:var(--glass-2);
+    box-shadow:0 0 0 1px var(--hair-2), 0 14px 30px -16px rgba(160,130,230,.5), inset 0 1px 0 rgba(255,255,255,.15);
+  }
+  .opt:active{transform:scale(.96);}
+  .opt.chosen{
+    border-color:rgba(201,184,255,.7);
+    background:linear-gradient(135deg, rgba(201,184,255,.18), rgba(184,240,221,.1));
+    box-shadow:0 0 26px rgba(201,184,255,.4), inset 0 1px 0 rgba(255,255,255,.2);
+  }
+  .opt .glint{
+    position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+    background:radial-gradient(120% 80% at 50% -20%, rgba(255,255,255,.16), transparent 60%);
+  }
+
+  .grid{display:grid;gap:12px;}
+  .grid-2{grid-template-columns:1fr 1fr;}
+  .grid-3{grid-template-columns:1fr 1fr 1fr;}
+
+  .scrollwrap{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;}
+  .scrollwrap::-webkit-scrollbar{width:0;}
+
+  /* ---------- response stamp ---------- */
+  #stampLayer{position:fixed;inset:0;z-index:40;pointer-events:none;display:flex;align-items:center;justify-content:center;}
+  .stamp{
+    font-family:var(--serif);font-style:italic;font-weight:500;
+    font-size:clamp(40px,12vw,64px);
+    color:var(--ink);
+    text-shadow:0 0 34px rgba(201,184,255,.8), 0 0 80px rgba(184,240,221,.4);
+    opacity:0;transform:scale(.82);
+    letter-spacing:.01em;text-align:center;padding:0 24px;
+  }
+  .stamp.go{animation:stampIn 1.5s var(--ease) forwards;}
+  @keyframes stampIn{
+    0%{opacity:0;transform:scale(.8);filter:blur(8px);}
+    22%{opacity:1;transform:scale(1.04);filter:blur(0);}
+    70%{opacity:1;transform:scale(1);}
+    100%{opacity:0;transform:scale(1.05);filter:blur(6px);}
+  }
+
+  /* ---------- welcome checkerboard ---------- */
+  #welcome{padding:0;}
+  #welcomeTap{
+    position:absolute;inset:calc(env(safe-area-inset-top) + 8px) 22px calc(env(safe-area-inset-bottom) + 16px);
+    cursor:pointer;border-radius:30px;overflow:hidden;
+  }
+  .wtile{
+    position:absolute;
+    border:.5px solid rgba(201,184,255,.16);
+    background:rgba(201,184,255,.025);
+    transition:background .6s var(--ease-soft);
+    pointer-events:none;
+  }
+  .wtile::after{
+    content:"";position:absolute;width:3px;height:3px;border-radius:50%;
+    top:50%;left:50%;transform:translate(-50%,-50%);
+    background:rgba(201,184,255,.45);
+    box-shadow:0 0 6px rgba(201,184,255,.7);
+    animation:twinkle 4s ease-in-out infinite;
+  }
+  @keyframes twinkle{0%,100%{opacity:.3;}50%{opacity:.95;}}
+  .kingband{
+    position:absolute;left:0;right:0;bottom:0;height:13%;
+    border:.5px solid rgba(243,226,176,.22);
+    background:linear-gradient(180deg, rgba(243,226,176,.02), rgba(243,226,176,.07));
+    pointer-events:none;
+  }
+  .kingband::after{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background:repeating-linear-gradient(90deg, transparent 0 26px, rgba(243,226,176,.08) 26px 27px);
+  }
+  #welcomeContent{
+    position:absolute;left:18px;right:18px;bottom:13%;
+    padding:24px 22px 30px;pointer-events:none;
+    border-radius:26px;
+    background:linear-gradient(180deg, rgba(12,10,31,0) 0%, rgba(12,10,31,.34) 36%, rgba(12,10,31,.6) 100%);
+    -webkit-backdrop-filter:blur(2px);backdrop-filter:blur(2px);
+  }
+
+  /* ---------- mad libs inputs ---------- */
+  .blank{
+    background:transparent;border:none;border-bottom:1px solid var(--hair-2);
+    color:var(--gold);font-family:var(--serif);font-style:italic;
+    font-size:22px;text-align:center;outline:none;
+    padding:2px 6px;min-width:78px;max-width:100%;width:auto;
+    transition:border-color .3s;
+  }
+  .blank:focus{border-color:var(--lav);}
+  .blank::placeholder{color:var(--ink-faint);font-style:normal;font-size:15px;}
+
+  /* ---------- captcha ---------- */
+  .ctile{
+    aspect-ratio:1;border-radius:14px;overflow:hidden;cursor:pointer;
+    border:1px solid var(--hair);position:relative;
+    transition:transform .3s var(--ease),box-shadow .3s,border-color .3s;
+  }
+  .ctile:active{transform:scale(.95);}
+  .ctile.sel{border-color:var(--mint);box-shadow:0 0 0 2px rgba(184,240,221,.6),0 0 18px rgba(184,240,221,.35);}
+  .ctile .check{
+    position:absolute;top:5px;left:5px;width:22px;height:22px;border-radius:50%;
+    background:var(--mint);color:#0c2a22;font-size:13px;display:flex;align-items:center;justify-content:center;
+    opacity:0;transform:scale(.4);transition:.3s var(--ease);font-weight:600;
+  }
+  .ctile.sel .check{opacity:1;transform:scale(1);}
+
+  /* ---------- calculating ---------- */
+  #calcOrbit{position:relative;width:220px;height:220px;margin:0 auto;}
+  .ring{position:absolute;inset:0;border-radius:50%;border:1px solid var(--hair);}
+  .ring.r2{inset:30px;border-color:rgba(184,240,221,.2);}
+  .ring.r3{inset:64px;border-color:rgba(255,212,184,.2);}
+  .planet{position:absolute;top:50%;left:50%;width:0;height:0;}
+  .planet i{position:absolute;width:12px;height:12px;border-radius:50%;}
+  .o1{animation:spin 8s linear infinite;}
+  .o2{animation:spin 5.5s linear infinite reverse;}
+  .o3{animation:spin 12s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .o1 i{left:-6px;top:-110px;background:var(--lav);box-shadow:0 0 16px var(--lav);}
+  .o2 i{left:-5px;top:-80px;width:10px;height:10px;background:var(--mint);box-shadow:0 0 14px var(--mint);}
+  .o3 i{left:-4px;top:-46px;width:8px;height:8px;background:var(--peach);box-shadow:0 0 12px var(--peach);}
+  #calcCore{
+    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    width:54px;height:54px;border-radius:50%;
+    background:radial-gradient(circle,#fff,var(--lav) 60%,transparent);
+    box-shadow:0 0 40px 8px rgba(201,184,255,.6);
+    animation:pulse 3s var(--ease-soft) infinite;
+  }
+  @keyframes pulse{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.9;}50%{transform:translate(-50%,-50%) scale(1.18);opacity:1;}}
+  #calcStatus{font-family:var(--serif);font-style:italic;font-size:21px;color:var(--ink-soft);min-height:30px;transition:opacity .5s;text-align:center;}
+  #calcBar{height:3px;border-radius:3px;background:var(--hair);overflow:hidden;margin-top:18px;}
+  #calcBarFill{height:100%;width:0;background:linear-gradient(90deg,var(--lav),var(--mint));box-shadow:0 0 12px var(--lav);transition:width .4s linear;}
+
+  /* ---------- reveal ---------- */
+  #revealText{
+    font-family:var(--serif);font-size:21px;line-height:1.62;color:var(--ink);
+    font-weight:400;letter-spacing:.005em;
+  }
+  .caret{display:inline-block;width:2px;height:1.05em;background:var(--lav);
+    vertical-align:-2px;margin-left:2px;animation:blink 1s step-end infinite;box-shadow:0 0 8px var(--lav);}
+  @keyframes blink{50%{opacity:0;}}
+
+  /* playing card */
+  #cardStage{display:flex;align-items:center;justify-content:center;flex:1;perspective:1200px;}
+  #card{
+    width:200px;height:288px;border-radius:18px;position:relative;
+    transform-style:preserve-3d;
+    transform:rotateY(180deg) translateY(40px) scale(.7);
+    opacity:0;
+    transition:transform 1.4s var(--ease), opacity 1s var(--ease-soft);
+  }
+  #card.flip{transform:rotateY(0) translateY(0) scale(1);opacity:1;}
+  .card-face{
+    position:absolute;inset:0;border-radius:18px;backface-visibility:hidden;
+    -webkit-backface-visibility:hidden;
+  }
+  .card-front{
+    background:linear-gradient(160deg,#fffdf7,#f3eee0);
+    box-shadow:0 30px 70px -20px rgba(201,184,255,.7),0 0 50px rgba(201,184,255,.35),inset 0 0 0 1px rgba(255,255,255,.6);
+    display:flex;flex-direction:column;justify-content:space-between;padding:16px;
+    color:#1a1535;
+  }
+  .card-back{
+    transform:rotateY(180deg);
+    background:repeating-linear-gradient(45deg,#2a1d4a,#2a1d4a 8px,#352457 8px,#352457 16px);
+    border:6px solid #f3eee0;
+  }
+  .corner{display:flex;flex-direction:column;align-items:center;line-height:.9;}
+  .corner.tl{align-self:flex-start;}
+  .corner.br{align-self:flex-end;transform:rotate(180deg);}
+  .corner .v{font-size:32px;font-weight:600;font-family:var(--sans);}
+  .corner .s{font-size:26px;}
+  .pip-center{font-size:96px;text-align:center;}
+  .red{color:#c0392b;}
+  .blk{color:#1a1535;}
+
+  /* glow pool under card */
+  #cardPool{
+    position:absolute;bottom:6%;left:50%;transform:translateX(-50%);
+    width:280px;height:120px;border-radius:50%;
+    background:radial-gradient(ellipse,rgba(201,184,255,.5),transparent 70%);
+    filter:blur(20px);opacity:0;transition:opacity 1.2s;pointer-events:none;
+  }
+  #cardPool.show{opacity:1;animation:poolpulse 4s var(--ease-soft) infinite;}
+  @keyframes poolpulse{0%,100%{opacity:.6;}50%{opacity:1;}}
+
+  /* ---------- buttons / chrome ---------- */
+  .btn{
+    border:1px solid var(--hair-2);background:var(--glass-2);
+    color:var(--ink);font-family:var(--sans);font-weight:400;font-size:15px;
+    letter-spacing:.16em;text-transform:uppercase;
+    padding:15px 30px;border-radius:40px;cursor:pointer;
+    backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    transition:transform .3s var(--ease),box-shadow .4s,background .4s;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.14);
+    animation:glowpulse 3.4s var(--ease-soft) infinite;
+  }
+  .btn:hover{background:rgba(201,184,255,.2);}
+  .btn:active{transform:scale(.96);}
+  @keyframes glowpulse{0%,100%{box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 0 0 rgba(201,184,255,0);}50%{box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 0 26px rgba(201,184,255,.32);}}
+
+  .footer{
+    position:fixed;bottom:calc(env(safe-area-inset-bottom) + 8px);left:0;right:0;
+    text-align:center;z-index:30;
+  }
+  #credit{font-size:11px;color:var(--ink-faint);letter-spacing:.08em;cursor:default;}
+  #igLink{font-size:11px;color:var(--lav);opacity:.55;letter-spacing:.08em;text-decoration:none;margin-left:14px;}
+  #igLink:hover{opacity:.9;}
+
+  /* cheat sheet */
+  #cheat{
+    position:fixed;left:50%;bottom:54px;transform:translateX(-50%) translateY(12px);
+    z-index:60;width:300px;max-width:88vw;
+    background:rgba(18,14,38,.92);backdrop-filter:blur(16px);
+    border:1px solid var(--hair-2);border-radius:18px;padding:16px 18px;
+    font-size:12px;color:var(--ink-soft);opacity:0;pointer-events:none;
+    transition:opacity .4s,transform .4s;
+  }
+  #cheat.show{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0);}
+  #cheat .armed{font-family:var(--serif);font-style:italic;font-size:20px;color:var(--gold);margin-bottom:10px;}
+  #cheat .map{line-height:1.5;letter-spacing:.02em;font-size:11px;}
+  #cheat .map b{color:var(--lav);font-weight:500;}
+
+  .zodiac-glyph{font-size:30px;line-height:1;}
+  .opt-label{font-size:13px;letter-spacing:.04em;color:var(--ink-soft);margin-top:6px;}
+
+  .ranger-dot{width:34px;height:34px;border-radius:50%;box-shadow:0 0 18px currentColor;}
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:.001s !important;animation-iteration-count:1 !important;}
+    .screen{transition:opacity .3s,visibility .3s;filter:none !important;transform:none !important;}
+    .orb{animation:none;}
+  }
+</style>
+</head>
+<body>
+
+<div id="sky"></div>
+<canvas id="starfield"></canvas>
+<div class="orb a"></div>
+<div class="orb b"></div>
+<div class="orb c"></div>
+<div id="moon"></div>
+
+<div id="app">
+<div id="frame">
+
+  <!-- 1. WELCOME -->
+  <section class="screen" id="welcome" data-screen="0">
+    <div id="welcomeTap" aria-label="Begin the reading">
+      <div id="tileGrid"></div>
+      <div class="kingband"></div>
+    </div>
+    <div id="welcomeContent" class="stagger">
+      <div class="eyebrow">✦ Signs</div>
+      <h1 class="title">Welcome to your<br>astrology reading</h1>
+      <p class="lede" style="margin-top:18px;">A few soft questions, read by the stars. When you're ready, breathe — and touch anywhere to begin.</p>
+      <div style="margin-top:20px;font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--lav);text-shadow:0 0 14px rgba(201,184,255,.6);">Tap to begin ✦</div>
+    </div>
+  </section>
+
+  <!-- 2. GENDER -->
+  <section class="screen" id="gender" data-screen="1">
+    <div style="padding-top:6vh;">
+      <div class="eyebrow">Question one</div>
+      <h2 class="q-title">What's your gender?</h2>
+    </div>
+    <div class="stagger" style="margin-top:auto;margin-bottom:8vh;display:flex;flex-direction:column;gap:14px;">
+      <button class="opt gender-btn" data-g="Male" style="height:74px;font-size:19px;letter-spacing:.04em;"><span class="glint"></span>Male</button>
+      <button class="opt gender-btn" data-g="Female" style="height:74px;font-size:19px;letter-spacing:.04em;"><span class="glint"></span>Female</button>
+      <button class="opt gender-btn" data-g="Other" style="height:74px;font-size:19px;letter-spacing:.04em;"><span class="glint"></span>Other</button>
+    </div>
+  </section>
+
+  <!-- 3. STAR SIGN -->
+  <section class="screen" id="starsign" data-screen="2">
+    <div style="padding-top:5vh;">
+      <div class="eyebrow">Question two</div>
+      <h2 class="q-title">What's your star sign?</h2>
+    </div>
+    <div class="scrollwrap" style="margin-top:24px;">
+      <div class="grid grid-3 stagger" id="zodiacGrid"></div>
+    </div>
+  </section>
+
+  <!-- 4. CHINESE ZODIAC -->
+  <section class="screen" id="chinese" data-screen="3">
+    <div style="padding-top:5vh;">
+      <div class="eyebrow">Question three</div>
+      <h2 class="q-title">What's your Chinese zodiac?</h2>
+    </div>
+    <div class="scrollwrap" style="margin-top:24px;">
+      <div class="grid grid-3 stagger" id="chineseGrid"></div>
+    </div>
+  </section>
+
+  <!-- 5. POWER RANGER -->
+  <section class="screen" id="ranger" data-screen="4">
+    <div style="padding-top:5vh;">
+      <div class="eyebrow">Question four</div>
+      <h2 class="q-title">If you were a guardian, which colour calls you?</h2>
+    </div>
+    <div class="scrollwrap" style="margin-top:24px;">
+      <div class="grid grid-2 stagger" id="rangerGrid"></div>
+    </div>
+  </section>
+
+  <!-- 6. MAD LIBS -->
+  <section class="screen" id="madlibs" data-screen="5">
+    <div style="padding-top:5vh;">
+      <div class="eyebrow">Question five</div>
+      <h2 class="q-title">Finish the thought.</h2>
+    </div>
+    <div class="glass stagger" style="margin-top:auto;margin-bottom:auto;padding:34px 26px;">
+      <p style="font-family:var(--serif);font-size:25px;line-height:2.1;color:var(--ink-soft);">
+        When I am at <input class="blank" id="ml1" placeholder="a place" autocomplete="off">,
+        I like to <input class="blank" id="ml2" placeholder="do a thing" autocomplete="off">
+        with <input class="blank" id="ml3" placeholder="someone" autocomplete="off">.
+      </p>
+      <div style="margin-top:26px;text-align:center;">
+        <button class="btn" id="mlNext">Continue</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. CAPTCHA -->
+  <section class="screen" id="captcha" data-screen="6">
+    <div style="padding-top:5vh;">
+      <div class="eyebrow">Just checking</div>
+      <h2 class="q-title">Select all squares with traffic lights.</h2>
+    </div>
+    <div class="glass stagger" style="margin-top:24px;padding:16px;">
+      <div class="grid grid-3" id="captchaGrid" style="gap:8px;"></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:16px;padding:0 4px;">
+        <span style="font-size:12px;color:var(--ink-faint);letter-spacing:.1em;">✦ not a robot</span>
+        <button class="btn" id="captchaVerify" style="padding:11px 26px;font-size:13px;">Verify</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. WORM -->
+  <section class="screen" id="worm" data-screen="7">
+    <div style="padding-top:8vh;text-align:center;">
+      <div style="font-size:64px;margin-bottom:18px;filter:drop-shadow(0 0 20px rgba(184,240,221,.5));">🪱</div>
+      <h2 class="q-title" style="padding:0 10px;">If I were a worm,<br>would you still love me?</h2>
+    </div>
+    <div class="stagger" style="margin-top:auto;margin-bottom:10vh;display:flex;gap:14px;">
+      <button class="opt worm-btn" data-w="Yes" style="flex:1;height:80px;font-size:21px;"><span class="glint"></span>Yes</button>
+      <button class="opt worm-btn" data-w="No" style="flex:1;height:80px;font-size:21px;"><span class="glint"></span>No</button>
+    </div>
+  </section>
+
+  <!-- 9. CALCULATING -->
+  <section class="screen" id="calc" data-screen="8">
+    <div style="margin:auto 0;text-align:center;width:100%;">
+      <div id="calcOrbit">
+        <div class="ring"></div><div class="ring r2"></div><div class="ring r3"></div>
+        <div id="calcCore"></div>
+        <div class="planet o1"><i></i></div>
+        <div class="planet o2"><i></i></div>
+        <div class="planet o3"><i></i></div>
+      </div>
+      <div style="margin-top:46px;" id="calcStatus">Aligning your stars…</div>
+      <div id="calcBar"><div id="calcBarFill"></div></div>
+    </div>
+  </section>
+
+  <!-- 10. REVEAL -->
+  <section class="screen" id="reveal" data-screen="9">
+    <div id="revealScroll" class="scrollwrap" style="padding-top:6vh;">
+      <div class="eyebrow" style="text-align:center;">Your reading</div>
+      <p id="revealText"><span class="caret"></span></p>
+    </div>
+    <div id="cardWrap" style="display:none;flex:1;position:relative;flex-direction:column;">
+      <div id="cardStage">
+        <div id="card">
+          <div class="card-face card-front" id="cardFront"></div>
+          <div class="card-face card-back"></div>
+        </div>
+        <div id="cardPool"></div>
+      </div>
+    </div>
+    <div style="text-align:center;padding:18px 0 6px;">
+      <button class="btn" id="revealNext">Next</button>
+    </div>
+  </section>
+
+</div>
+</div>
+
+<div id="stampLayer"><div class="stamp" id="stamp"></div></div>
+
+<div class="footer">
+  <span id="credit">A webapp by Kenneth Aidan Foo</span>
+  <a id="igLink" href="https://www.instagram.com/oddpaq" target="_blank" rel="noopener">Follow @oddpaq</a>
+</div>
+
+<div id="cheat">
+  <div class="armed" id="cheatArmed">— of —</div>
+  <div class="map" id="cheatMap"></div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============== STATE ============== */
+  var VALUES = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
+  var VALUE_NAMES = ["Ace","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Jack","Queen","King"];
+  var SUITS = ["Clubs","Hearts","Spades","Diamonds"]; /* CHaSeD */
+  var SUIT_SYM = {Clubs:"♣",Hearts:"♥",Spades:"♠",Diamonds:"♦"};
+  var SUIT_RED = {Clubs:false,Hearts:true,Spades:false,Diamonds:true};
+
+  var armed = { value:"A", valueName:"Ace", suit:"Clubs" };
+  var picks = { gender:null, zodiac:null, zodiacGlyph:null, chinese:null, ranger:null, worm:null };
+
+  var ZODIAC = [
+    ["Aries","♈"],["Taurus","♉"],["Gemini","♊"],["Cancer","♋"],
+    ["Leo","♌"],["Virgo","♍"],["Libra","♎"],["Scorpio","♏"],
+    ["Sagittarius","♐"],["Capricorn","♑"],["Aquarius","♒"],["Pisces","♓"]
+  ];
+  var CHINESE = ["Rat","Ox","Tiger","Rabbit","Dragon","Snake","Horse","Goat","Monkey","Rooster","Dog","Pig"];
+  var CHINESE_G = {Rat:"🐀",Ox:"🐂",Tiger:"🐅",Rabbit:"🐇",Dragon:"🐉",Snake:"🐍",Horse:"🐎",Goat:"🐐",Monkey:"🐒",Rooster:"🐓",Dog:"🐕",Pig:"🐖"};
+  var RANGERS = [
+    ["Red","#ff5a5a"],["Blue","#5a9bff"],["Black","#9a93b5"],
+    ["Yellow","#ffd84d"],["Pink","#ff8ec0"],["Green","#6fe6a8"]
+  ];
+
+  /* ============== STARFIELD ============== */
+  var cv = document.getElementById("starfield"), ctx = cv.getContext("2d"), stars=[], W,H,DPR;
+  function sizeStar(){
+    DPR = Math.min(window.devicePixelRatio||1,2);
+    W = cv.width = innerWidth*DPR; H = cv.height = innerHeight*DPR;
+    cv.style.width=innerWidth+"px"; cv.style.height=innerHeight+"px";
+    stars=[]; var n=Math.round(innerWidth*innerHeight/4500);
+    for(var i=0;i<n;i++){
+      stars.push({x:Math.random()*W,y:Math.random()*H,r:(Math.random()*1.3+.3)*DPR,
+        a:Math.random(),sp:Math.random()*.012+.003,dx:(Math.random()-.5)*.06*DPR,dy:Math.random()*.05*DPR+.01*DPR});
+    }
+  }
+  var reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function drawStars(){
+    ctx.clearRect(0,0,W,H);
+    for(var i=0;i<stars.length;i++){
+      var s=stars[i];
+      if(!reduced){ s.a+=s.sp; var tw=(Math.sin(s.a)+1)/2; s.x+=s.dx; s.y+=s.dy;
+        if(s.y>H)s.y=0; if(s.x<0)s.x=W; if(s.x>W)s.x=0; var op=.18+tw*.7; }
+      else { var op=.5; }
+      ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,6.29);
+      ctx.fillStyle="rgba(220,210,255,"+op+")"; ctx.fill();
+    }
+    requestAnimationFrame(drawStars);
+  }
+  sizeStar(); drawStars();
+  addEventListener("resize",function(){ sizeStar(); buildTiles(); });
+
+  /* ============== SCREEN MACHINE ============== */
+  var screens = Array.prototype.slice.call(document.querySelectorAll(".screen"));
+  var cur = 0, busy=false;
+  function show(i){
+    if(i===cur) return;
+    var from=screens[cur], to=screens[i];
+    from.classList.add("leaving"); from.classList.remove("active");
+    cur=i;
+    setTimeout(function(){ from.classList.remove("leaving"); },800);
+    to.classList.add("active");
+    if(i===2 || i===9) document.getElementById("moon").classList.add("show");
+    if(i===8) runCalc();
+    if(i===9) startReveal();
+  }
+  screens[0].classList.add("active");
+
+  /* response stamp then advance */
+  function respond(text, next){
+    var st=document.getElementById("stamp");
+    st.textContent=text; st.classList.remove("go"); void st.offsetWidth; st.classList.add("go");
+    setTimeout(function(){ if(typeof next==="number") show(next); else if(next) next(); }, 1050);
+  }
+
+  /* ============== 1. WELCOME — VALUE CAPTURE ============== */
+  var tileGrid=document.getElementById("tileGrid");
+  function buildTiles(){
+    tileGrid.innerHTML="";
+    /* 4 cols x 3 rows over the top 87% (above king band) */
+    var cols=4, rows=3;
+    for(var r=0;r<rows;r++){
+      for(var c=0;c<cols;c++){
+        var t=document.createElement("div");
+        t.className="wtile";
+        t.style.left=(c/cols*100)+"%";
+        t.style.top=(r/rows*87)+"%";
+        t.style.width=(100/cols)+"%";
+        t.style.height=(87/rows)+"%";
+        tileGrid.appendChild(t);
+      }
+    }
+  }
+  buildTiles();
+
+  document.getElementById("welcomeTap").addEventListener("click", function(e){
+    var rect=this.getBoundingClientRect();
+    var x=(e.clientX-rect.left)/rect.width;
+    var y=(e.clientY-rect.top)/rect.height;
+    var idx;
+    if(y>=0.87){ idx=12; } /* king band */
+    else {
+      var col=Math.min(3,Math.floor(x*4));
+      var row=Math.min(2,Math.floor((y/0.87)*3));
+      idx=row*4+col;
+    }
+    if(idx<0)idx=0; if(idx>12)idx=12;
+    armed.value=VALUES[idx]; armed.valueName=VALUE_NAMES[idx];
+    updateCheat();
+    /* gentle flash of the chosen tile */
+    var tile;
+    if(idx===12){ tile=document.querySelector(".kingband"); }
+    else { tile=tileGrid.children[idx]; }
+    if(tile){ tile.style.background="rgba(201,184,255,.16)";
+      setTimeout(function(){ tile.style.background=""; },500); }
+    setTimeout(function(){ show(1); }, 180);
+  });
+
+  /* ============== 2. GENDER — SUIT CAPTURE ============== */
+  Array.prototype.forEach.call(document.querySelectorAll(".gender-btn"), function(btn){
+    btn.addEventListener("click", function(e){
+      var rect=btn.getBoundingClientRect();
+      var q=Math.min(3,Math.floor((e.clientX-rect.left)/rect.width*4));
+      armed.suit=SUITS[q];
+      picks.gender=btn.getAttribute("data-g");
+      updateCheat();
+      btn.classList.add("chosen");
+      respond("OK!", 2);
+    });
+  });
+
+  /* ============== 3. STAR SIGN ============== */
+  var zg=document.getElementById("zodiacGrid");
+  ZODIAC.forEach(function(z){
+    var b=document.createElement("button");
+    b.className="opt"; b.style.padding="16px 6px"; b.style.display="flex";
+    b.style.flexDirection="column"; b.style.alignItems="center";
+    b.innerHTML='<span class="glint"></span><span class="zodiac-glyph">'+z[1]+'</span><span class="opt-label">'+z[0]+'</span>';
+    b.addEventListener("click",function(){
+      picks.zodiac=z[0]; picks.zodiacGlyph=z[1];
+      markChosen(zg,b);
+      respond("Great!", 3);
+    });
+    zg.appendChild(b);
+  });
+
+  /* ============== 4. CHINESE ZODIAC ============== */
+  var cg=document.getElementById("chineseGrid");
+  CHINESE.forEach(function(a){
+    var b=document.createElement("button");
+    b.className="opt"; b.style.padding="16px 6px"; b.style.display="flex";
+    b.style.flexDirection="column"; b.style.alignItems="center";
+    b.innerHTML='<span class="glint"></span><span class="zodiac-glyph">'+CHINESE_G[a]+'</span><span class="opt-label">'+a+'</span>';
+    b.addEventListener("click",function(){
+      picks.chinese=a; markChosen(cg,b);
+      respond("很好!", 4);
+    });
+    cg.appendChild(b);
+  });
+
+  /* ============== 5. POWER RANGER ============== */
+  var rg=document.getElementById("rangerGrid");
+  RANGERS.forEach(function(r){
+    var b=document.createElement("button");
+    b.className="opt"; b.style.padding="20px 10px"; b.style.display="flex";
+    b.style.alignItems="center"; b.style.gap="12px";
+    b.innerHTML='<span class="glint"></span><span class="ranger-dot" style="color:'+r[1]+';background:'+r[1]+'"></span><span style="font-size:16px;letter-spacing:.05em;">'+r[0]+'</span>';
+    b.addEventListener("click",function(){
+      picks.ranger=r[0]; markChosen(rg,b);
+      respond("Strong Choice!", 5);
+    });
+    rg.appendChild(b);
+  });
+
+  function markChosen(container,btn){
+    Array.prototype.forEach.call(container.children,function(c){c.classList.remove("chosen");});
+    btn.classList.add("chosen");
+  }
+
+  /* ============== 6. MAD LIBS ============== */
+  document.getElementById("mlNext").addEventListener("click",function(){
+    respond("Insightful!", 6);
+  });
+
+  /* ============== 7. CAPTCHA ============== */
+  var capGrid=document.getElementById("captchaGrid");
+  var lightCells=[1,3,4,7]; /* which tiles draw a traffic light */
+  for(var i=0;i<9;i++){
+    var t=document.createElement("div");
+    t.className="ctile";
+    var hasLight=lightCells.indexOf(i)>=0;
+    t.innerHTML=captchaSVG(hasLight,i)+'<div class="check">✓</div>';
+    t.addEventListener("click",function(){ this.classList.toggle("sel"); });
+    capGrid.appendChild(t);
+  }
+  function captchaSVG(light,seed){
+    var sky=["#2a2350","#1f2a48","#33264e"][seed%3];
+    var s='<svg viewBox="0 0 100 100" style="width:100%;height:100%;display:block">';
+    s+='<rect width="100" height="100" fill="'+sky+'"/>';
+    /* faint road / buildings */
+    s+='<rect x="0" y="68" width="100" height="32" fill="rgba(0,0,0,.25)"/>';
+    s+='<rect x="'+(10+seed*7%30)+'" y="40" width="20" height="34" fill="rgba(255,255,255,.05)"/>';
+    s+='<circle cx="'+(70-seed*5%25)+'" cy="22" r="6" fill="rgba(243,226,176,.18)"/>';
+    if(light){
+      s+='<rect x="42" y="26" width="16" height="44" rx="4" fill="#15131f"/>';
+      s+='<circle cx="50" cy="36" r="4.5" fill="#ff5a5a"/>';
+      s+='<circle cx="50" cy="48" r="4.5" fill="#ffd84d" opacity=".5"/>';
+      s+='<circle cx="50" cy="60" r="4.5" fill="#6fe6a8" opacity=".5"/>';
+      s+='<rect x="49" y="70" width="2" height="14" fill="#15131f"/>';
+    }
+    s+='</svg>'; return s;
+  }
+  document.getElementById("captchaVerify").addEventListener("click",function(){
+    respond("Are you sure…?", 7);
+  });
+
+  /* ============== 8. WORM ============== */
+  Array.prototype.forEach.call(document.querySelectorAll(".worm-btn"),function(b){
+    b.addEventListener("click",function(){
+      picks.worm=b.getAttribute("data-w");
+      b.classList.add("chosen");
+      respond("okay…", 8);
+    });
+  });
+
+  /* ============== 9. CALCULATING ============== */
+  var CALC_LINES=[
+    "Aligning your stars…","Consulting the aether…","Cross-referencing your sign…",
+    "Shuffling the deck of fate…","Reading the spaces between…","Listening to the moon…"
+  ];
+  var calcRun=false;
+  function runCalc(){
+    if(calcRun) return; calcRun=true;
+    var status=document.getElementById("calcStatus");
+    var fill=document.getElementById("calcBarFill");
+    var li=0; status.textContent=CALC_LINES[0];
+    var cycle=setInterval(function(){
+      status.style.opacity=0;
+      setTimeout(function(){
+        li=(li+1)%CALC_LINES.length;
+        status.textContent=CALC_LINES[li]; status.style.opacity=1;
+      },420);
+    },1500);
+    var p=0;
+    var prog=setInterval(function(){
+      p+=Math.random()*9+5; if(p>100)p=100; fill.style.width=p+"%";
+      if(p>=100){ clearInterval(prog); }
+    },420);
+    setTimeout(function(){
+      clearInterval(cycle); fill.style.width="100%";
+      show(9);
+    }, 7200);
+  }
+
+  /* ============== 10. REVEAL ============== */
+  function ordinal(n){
+    var ones=["","first","second","third","fourth","fifth","sixth","seventh","eighth","ninth","tenth",
+      "eleventh","twelfth","thirteenth","fourteenth","fifteenth","sixteenth","seventeenth","eighteenth","nineteenth","twentieth",
+      "twenty-first","twenty-second","twenty-third","twenty-fourth","twenty-fifth","twenty-sixth","twenty-seventh",
+      "twenty-eighth","twenty-ninth","thirtieth","thirty-first"];
+    return ones[n]||(n+"th");
+  }
+  var MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+  var INTERNAL=[
+    "You are a person prone to bouts of real self-examination. This is in sharp contrast to a striking ability you have developed to appear socially very engaged, even the life and soul of the party; but in a way that only convinces others.",
+    "You will often be at a gathering and find yourself playing a part. While on the one hand you'll be talkative and funny, you'll be detaching yourself to the point where you will find yourself watching everything going on around you and feeling utterly unable to engage.",
+    "You play conversations back to yourself in your head and wonder what that person really meant when they said such-and-such."
+  ];
+  var CONFLICT=[
+    "You learned to deal with conflict by exercising control. You like to show a calm, self-assured, fluid kind of stability (but because this is self-consciously created, it will create bouts of frustrated silliness and a delight in extremes, or at least a delight in being seen to be extreme). You most easily recognise this control in how you are with the people around you.",
+    "You have learned to protect yourself by keeping people at bay. Because in the past you have learned to be disappointed by people, you instinctively keep people at arm's length, until you decide they are to be allowed over that line into your group of close friends. However, once across that line, the problem is that an emotional dependency kicks in which leaves you feeling very hurt or rejected if it appears they have betrayed that status.",
+    "Because you are prone to self-examination, you will be aware of these traits. However, you are unusually able to examine even that self-examination, which means that you have become concerned about what the real you is."
+  ];
+  var HOBBIES=[
+    "You are creative, and have tried different avenues to utilise that ability. It may not be that you specifically, say, paint; it may be that your creativity shows itself in more subtle ways, but you will certainly find yourself having vivid and well-formed ideas which others find hard to grasp.",
+    "You set high standards for yourself, and in many ways are a bit of a perfectionist. The problem is that it means you often don't get stuff done, because you are frustrated by the idea of mediocrity and wearied by the idea of starting something afresh. However, once your brain is engaged you'll find yourself sailing. Very likely this will have led you to consider writing a novel or some such, but a fear that you won't quite achieve what you want stops you getting on with it.",
+    "There are ways in which you have been made to feel isolated from certain groups in the past — something of an outsider. Now what is happening is that you are taking that outsider role and defending it to the point of consciously avoiding being part of a group. This will serve you enormously well in your creative and career pursuits. You have an enormous cynicism towards those who prefer to be part of a group, and you always feel a pang of disappointment when your 'close' friends seem to follow that route."
+  ];
+  var ASSERTIONS=[
+    "You have links at the moment with America, which are quite interesting and will look to yield worthwhile results. You're naturally a little disorganised. A look around your living space would show a box of photos unorganised into albums, out-of-date medicines, broken items not thrown out, and notes to yourself which are significantly out of date.",
+    "You tend to lack motivation. Because you're resourceful and talented enough to be pretty successful when you put your mind to things, this encourages you to procrastinate and put them off. Equally, you've given up dreams a little easily when your mind flitted elsewhere. There are in your home signs of an excursion into playing a musical instrument which you have since abandoned, or are finding yourself less interested in. (This may alternatively relate to poetry or creative writing you've briefly tried your hand at and left behind.)"
+  ];
+  var CONCLUSION="It's very interesting doing your reading. You are certainly bright, and open to life's possibilities — something not normally found among achieving people. You would do well to be less self-absorbed, as it tends to distance you a little. You could let people in a little more — I am aware there is a side you feel you should hide — but you really have an appealing personality, and also…";
+
+  function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+  var sections=[], secIdx=0, typing=false;
+  function startReveal(){
+    var glyph=picks.zodiacGlyph||"✦";
+    var now=new Date();
+    var dateStr="the "+ordinal(now.getDate())+" day of "+MONTHS[now.getMonth()];
+    var intro="Hello "+glyph+". Welcome to your astrology reading on "+dateStr+". Here is your reading…";
+    sections=[
+      intro,
+      pick(INTERNAL),
+      pick(CONFLICT),
+      pick(HOBBIES),
+      pick(ASSERTIONS),
+      CONCLUSION
+    ];
+    secIdx=0;
+    var rt=document.getElementById("revealText");
+    rt.innerHTML='<span class="caret"></span>';
+    typeSection();
+  }
+
+  function typeSection(){
+    if(secIdx>=sections.length){ doCardReveal(); return; }
+    var rt=document.getElementById("revealText");
+    var full=sections[secIdx];
+    /* fresh paragraph each section (one section visible at a time) */
+    rt.innerHTML='<span id="typed"></span><span class="caret"></span>';
+    var typed=document.getElementById("typed");
+    var nextBtn=document.getElementById("revealNext");
+    nextBtn.style.opacity=".3"; nextBtn.style.pointerEvents="none";
+    typing=true;
+    var i=0;
+    var sc=document.getElementById("revealScroll");
+    (function step(){
+      if(i<=full.length){
+        typed.textContent=full.slice(0,i);
+        sc.scrollTop=sc.scrollHeight;
+        i++;
+        /* reduced-motion: still types (the reveal IS the typewriter) but quicker, with no random jitter */
+        var delay = reduced
+          ? (".,;—…".indexOf(full[i-1])>=0 ? 30 : 6)
+          : (".,;—…".indexOf(full[i-1])>=0 ? 120 : 17+Math.random()*22);
+        setTimeout(step, delay);
+      } else {
+        typing=false;
+        nextBtn.style.opacity="1"; nextBtn.style.pointerEvents="auto";
+      }
+    })();
+  }
+
+  document.getElementById("revealNext").addEventListener("click",function(){
+    if(typing){ /* skip to full */
+      var typed=document.getElementById("typed");
+      if(typed){ typed.textContent=sections[secIdx]; typing=false;
+        this.style.opacity="1"; this.style.pointerEvents="auto"; }
+      return;
+    }
+    secIdx++;
+    typeSection();
+  });
+
+  function doCardReveal(){
+    var rt=document.getElementById("revealText");
+    document.getElementById("revealScroll").style.display="none";
+    document.getElementById("revealNext").style.display="none";
+    var wrap=document.getElementById("cardWrap");
+    wrap.style.display="flex";
+
+    /* build card face */
+    var red=SUIT_RED[armed.suit];
+    var sym=SUIT_SYM[armed.suit];
+    var cls=red?"red":"blk";
+    var front=document.getElementById("cardFront");
+    front.innerHTML=
+      '<div class="corner tl '+cls+'"><span class="v">'+armed.value+'</span><span class="s">'+sym+'</span></div>'+
+      '<div class="pip-center '+cls+'">'+sym+'</div>'+
+      '<div class="corner br '+cls+'"><span class="v">'+armed.value+'</span><span class="s">'+sym+'</span></div>';
+
+    /* punchline line above the card */
+    var line=document.createElement("p");
+    line.style.cssText="font-family:var(--serif);font-size:20px;line-height:1.4;text-align:center;color:rgba(244,241,255,.88);font-style:italic;margin:0 auto 6px;max-width:300px;width:100%;overflow-wrap:break-word;text-shadow:0 1px 2px rgba(0,0,0,.5);opacity:0;transition:opacity 1.2s;";
+    line.innerHTML="…and also — you picked the <b style='color:var(--gold);font-style:normal;'>"+armed.valueName+" of "+armed.suit+"</b>.";
+    wrap.insertBefore(line, wrap.firstChild);
+
+    requestAnimationFrame(function(){
+      document.getElementById("cardPool").classList.add("show");
+      setTimeout(function(){ line.style.opacity="1"; },200);
+      setTimeout(function(){ document.getElementById("card").classList.add("flip"); }, 600);
+    });
+  }
+
+  /* ============== CHEAT SHEET (triple-tap credit) ============== */
+  function updateCheat(){
+    document.getElementById("cheatArmed").textContent=armed.valueName+" of "+armed.suit;
+    var m="<b>Welcome (value)</b> · 4×3 grid A 2 3 4 / 5 6 7 8 / 9 10 J Q · bottom band = K<br><br>"+
+      "<b>Gender (suit)</b> · quarters L→R: ♣ ♥ ♠ ♦ (CHaSeD)<br><br>"+
+      "Armed: <b>"+armed.value+" "+SUIT_SYM[armed.suit]+"</b>";
+    document.getElementById("cheatMap").innerHTML=m;
+  }
+  updateCheat();
+  var taps=[], cheatOpen=false;
+  document.getElementById("credit").addEventListener("click",function(){
+    var now=Date.now(); taps.push(now); taps=taps.filter(function(t){return now-t<700;});
+    if(taps.length>=3){ taps=[]; cheatOpen=!cheatOpen;
+      document.getElementById("cheat").classList.toggle("show",cheatOpen); updateCheat(); }
+  });
+
+})();
+</script>
+</body>
+</html>
