@@ -103,7 +103,7 @@ body {
 
 /* ===== typography ===== */
 .label {
-  font-family: 'Archivo', 'Manrope', system-ui, sans-serif;
+  font-family: 'Space Grotesk', 'Manrope', system-ui, sans-serif;
   font-weight: 700;
   font-size: 13px;
   letter-spacing: 0.22em;
@@ -120,7 +120,7 @@ body {
   overflow-wrap: break-word;
 }
 .sub {
-  font-family: 'Archivo', 'Manrope', system-ui, sans-serif;
+  font-family: 'Space Grotesk', 'Manrope', system-ui, sans-serif;
   font-weight: 600;
   font-size: 15px;
   color: rgba(255, 255, 255, 0.78);
@@ -347,7 +347,7 @@ body {
   max-width: 100%;
 }
 #wContent .wsub {
-  font-family: 'Archivo', 'Manrope', system-ui, sans-serif;
+  font-family: 'Space Grotesk', 'Manrope', system-ui, sans-serif;
   font-weight: 600;
   font-size: 18px;
   margin-top: 18px;
@@ -360,7 +360,7 @@ body {
 }
 #wContent .tap {
   margin-top: 14px;
-  font-family: 'Archivo', 'Manrope', system-ui, sans-serif;
+  font-family: 'Space Grotesk', 'Manrope', system-ui, sans-serif;
   font-weight: 600;
   font-size: 13px;
   letter-spacing: 0.18em;
@@ -573,7 +573,7 @@ body {
   transition: width 0.3s linear;
 }
 #calcStatus {
-  font-family: 'Archivo', 'Manrope', system-ui, sans-serif;
+  font-family: 'Space Grotesk', 'Manrope', system-ui, sans-serif;
   font-weight: 600;
   font-size: 17px;
   color: #fff;
@@ -598,7 +598,7 @@ body {
   margin-bottom: 20px;
 }
 .revh {
-  font-family: 'Archivo', 'Manrope', system-ui, sans-serif;
+  font-family: 'Space Grotesk', 'Manrope', system-ui, sans-serif;
   font-weight: 700;
   font-size: 12px;
   letter-spacing: 0.2em;
@@ -607,7 +607,7 @@ body {
   margin-bottom: 6px;
 }
 .revtext {
-  font-family: 'Archivo', 'Manrope', system-ui, sans-serif;
+  font-family: 'Space Grotesk', 'Manrope', system-ui, sans-serif;
   font-weight: 400;
   font-size: 17px;
   line-height: 1.5;
@@ -734,7 +734,7 @@ body {
   bottom: calc(env(safe-area-inset-bottom) + 8px);
   z-index: 6;
   text-align: center;
-  font-family: 'Archivo', 'Manrope', system-ui, sans-serif;
+  font-family: 'Space Grotesk', 'Manrope', system-ui, sans-serif;
   font-weight: 600;
   font-size: 11px;
   color: rgba(255, 255, 255, 0.4);
@@ -754,7 +754,7 @@ body {
   border: 2px solid rgba(255, 255, 255, 0.4);
   background: transparent;
   color: #fff;
-  font-family: 'Archivo', 'Manrope', system-ui, sans-serif;
+  font-family: 'Space Grotesk', 'Manrope', system-ui, sans-serif;
   font-weight: 700;
   font-size: 16px;
   cursor: pointer;
@@ -768,7 +768,7 @@ body {
   padding: 20px;
   max-width: 330px;
   width: 100%;
-  font-family: 'Archivo', 'Manrope', system-ui, sans-serif;
+  font-family: 'Space Grotesk', 'Manrope', system-ui, sans-serif;
   font-weight: 500;
   font-size: 13px;
   line-height: 1.5;
@@ -826,7 +826,7 @@ body {
   margin: 0 0 8px;
 }
 #infoCard p {
-  font-family: 'Archivo', 'Manrope', system-ui, sans-serif;
+  font-family: 'Space Grotesk', 'Manrope', system-ui, sans-serif;
   font-weight: 500;
   font-size: 14px;
   line-height: 1.5;
