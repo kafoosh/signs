@@ -15,7 +15,6 @@ export default function Potato({ onAnswer }) {
         <StaggerItem
           as="img"
           id="potatoImg"
-          loading="lazy"
           alt="potato"
           src={asset('img/potato.png')}
         />
