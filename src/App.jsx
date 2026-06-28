@@ -1,6 +1,7 @@
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { screenVariants } from './lib/motion.js'
+import { asset } from './lib/asset.js'
 
 import Backdrop from './components/Backdrop.jsx'
 import ResponseStamp from './components/ResponseStamp.jsx'
@@ -32,6 +33,16 @@ const SCREENS = [
 
 export default function App() {
   const [idx, setIdx] = useState(0)
+
+  // The potato (and captcha) screens use large multi-MB images that, left to
+  // load on mount, lag visibly when reached. Warm the browser cache on startup
+  // so they're ready well before the user arrives at those screens.
+  useEffect(() => {
+    for (const src of ['img/potato.png', 'img/captcha.png']) {
+      const img = new Image()
+      img.src = asset(src)
+    }
+  }, [])
 
   // The secret: default = Seven of Spades (centre taps still yield a playable card).
   const [captured, setCaptured] = useState({ valueIdx: 6, suitIdx: 2 })
